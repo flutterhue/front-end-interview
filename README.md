@@ -46,7 +46,7 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
 * HTML 和 XHTML 有什么区别？
   - https://www.zhihu.com/question/19783105/answer/13113567
 * 如果页面使用 'application/xhtml+xml' 会有什么问题吗？
-  - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如<img />, <br/>, <input />等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
+  - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
 * 如果网页内容需要支持多语言，你会怎么做？
 * 在设计和开发多语言网站时，有哪些问题你必须要考虑？
 * 使用 `data-` 属性的好处是什么？
@@ -61,13 +61,21 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
   - `<script defer>` 异步加载, 执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成, 但是执行会按照声明script的顺序.
 * 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗？
   - https://www.zhihu.com/question/309982596
+  - css加载放HEAD防止FOUC(flash of unstyled content), 但是如果css过大可能导致白屏时间过长可以考虑放一部分非首屏可见元素的css在末尾.
+  - js加载放末尾防止白屏时间过长. 但一些统计类js, 或是要网页面中添加内容的js可以考虑放在开头.
 * 什么是渐进式渲染 (progressive rendering)？
+  - https://stackoverflow.com/questions/33651166/what-is-progressive-rendering
+  - 目的:尽快让用户看到内容
+  - 手段: 图片懒加载, 可视化内容优先(SSR)
 * 你用过哪些不同的 HTML 模板语言？
 
 #### <a name='css-questions'>CSS 相关问题：</a>
 
 * CSS 中类 (classes) 和 ID 的区别。
+  - id用来标记一个 类用来标记很多个  
+  - id优先级更高
 * 请问 "resetting" 和 "normalizing" CSS 之间的区别？你会如何选择，为什么？
+  - https://www.jianshu.com/p/a7b9e2d20b73
 * 请解释浮动 (Floats) 及其工作原理。
 * 描述`z-index`和叠加上下文是如何形成的。
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
