@@ -77,9 +77,25 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
 * 请问 "resetting" 和 "normalizing" CSS 之间的区别？你会如何选择，为什么？
   - https://www.jianshu.com/p/a7b9e2d20b73
 * 请解释浮动 (Floats) 及其工作原理。
+  - 强制block, 同时跳出文本流浮动元素从网页的正常流动中移出，但保留了部分的流动性，会影响其他元素的定位（比如文字会围绕着浮动元素）。这一点与绝对定位不同，绝对定位的元素完全从文档流脱离
+  - 如果浮动元素的父元素只包含浮动元素，那么该父元素的高度会坍塌为0，我们可以通过清除（clear）从浮动元素后到父元素关闭前之间的浮动来修复这个问题(clear: both | left | right)
+  - 把浮动元素的父元素属性设置为overflow: auto或overflow: hidden,会使其内部子元素形成BFC，并且父元素会扩张自己，使其能够包围它的子元素
 * 描述`z-index`和叠加上下文是如何形成的。
+  - https://juejin.im/post/5b876f86518825431079ddd6
+  - https://www.zhangxinxu.com/wordpress/2016/01/understand-css-stacking-context-order-z-index/
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
+  - http://www.cnblogs.com/lhb25/p/inside-block-formatting-ontext.html
 * 列举不同的清除浮动的技巧，并指出它们各自适用的使用场景。
+  - 末尾添加一个空div作为兄弟：`<div style="clear: both;"/>`
+  - 给父元素添加一个伪类
+  ```css
+    .clearfix::after {
+    content: '',
+    display: block;
+    clear: both;
+    }
+  ```
+  - 父元素添加overflow: hidden | auto 或其他能够构成BFC的属性
 * 请解释 CSS sprites，以及你要如何在页面或网站中实现它。
 * 你最喜欢的图片替换方法是什么，你如何选择使用。
 * 你会如何解决特定浏览器的样式问题？
