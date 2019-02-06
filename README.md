@@ -20,6 +20,9 @@
 * 请写一个简单的幻灯效果页面。
 
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
+  + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
+  + CSS动画更流畅，JS易导致页面掉帧。
+  + CSS兼容性差
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
   + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
   + `<script>``<img>``<iframe>``<link>``<video>``<audio>``等带有`src`属性的标签默认支持跨域
@@ -62,11 +65,8 @@
   - https://www.zhihu.com/question/19783105/answer/13113567
 * 如果页面使用 'application/xhtml+xml' 会有什么问题吗？
   - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
-* 如果网页内容需要支持多语言，你会怎么做？
-* 在设计和开发多语言网站时，有哪些问题你必须要考虑？
 * 使用 `data-` 属性的好处是什么？
   - 自定义的data Chrome中可以用dataset来取得, 比如 data-house-id="13"  xx.dataset.houseId = 13
-* 如果把 HTML5 看作做一个开放平台，那它的构建模块有哪些？
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
   - https://github.com/lmk123/blog/issues/66
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
@@ -74,17 +74,14 @@
   - `<script>` 同步加载, 加载完成后立即执行
   - `<script async>` 异步加载, 加载立即执行, 不考虑多个script的先后顺序
   - `<script defer>` 异步加载, 执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成, 但是执行会按照声明script的顺序.
-* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗？/ 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
+* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗 / 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
   - https://www.zhihu.com/question/309982596
   - css加载放HEAD防止FOUC(flash of unstyled content), 但是如果css过大可能导致白屏时间过长可以考虑放一部分非首屏可见元素的css在末尾.
   - js加载放末尾防止白屏时间过长. 但一些统计类js, 或是要网页面中添加内容的js可以考虑放在开头.
 * 什么是渐进式渲染 (progressive rendering)？
   - https://stackoverflow.com/questions/33651166/what-is-progressive-rendering
   - 目的:尽快让用户看到内容
-  - 手段: 图片懒加载, 可视化内容优先(SSR)
-* 你用过哪些不同的 HTML 模板语言？
-
-#### <a name='css-questions'>CSS 相关问题：</a>
+  - 手段: 图片懒加载, 可视化内容优先(Server Side Rendering, SSR 只返回首屏可视化部分的html，已由服务器端渲染好)
 
 * CSS 中类 (classes) 和 ID 的区别。
   - id用来标记一个 类用来标记很多个  
@@ -138,9 +135,10 @@
 * 为什么响应式设计 (responsive design) 和自适应设计 (adaptive design) 不同？
 * 你有兼容 retina 屏幕的经历吗？如果有，在什么地方使用了何种技术？
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
-
-#### <a name='js-questions'>JS 相关问题：</a>
-
+* 手写函数防抖和函数节流
+```
+  
+```
 * 请解释事件代理 (event delegation)。
 * 请解释 JavaScript 中 `this` 是如何工作的。
 * 请解释原型继承 (prototypal inheritance) 的原理。
