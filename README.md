@@ -21,6 +21,39 @@
 
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
+  + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
+  + `<script>``<img>``<iframe>``<link>``<video>``<audio>``等带有`src`属性的标签默认支持跨域
+  + 不同源的document或者js(例如iframe中的js)想要读取或者操作当前document将受到限制
+  + 禁止Ajax发起跨域请求， 实际上请求会发起， 只不过返回响应会被浏览器拦截。
+  + Ajax跨域请求(注意是请求不是响应， 响应会被拦截)不能携带本网站Cookie
+  + 跨域方式
+  ```js
+    // 1. JSONP
+    利用`<script><img><iframe>`标签默认跨域的特征, 所以该方式只支持get方法
+    与服务器约定好， 让服务器返回一个`script`并在其中回调页面中的函数， 页面所需的数据作为调用参数
+    
+    // html
+    // <script type="text/javascript" src="http://a.com/index.js">
+    //  function showTable(tableData){
+    //   需要ajax获取服务器端表单数据
+    // }
+    // </script>
+    // <script type="text/javascript" src="http://b.com/remote.js"></script> 
+    // 当然也可以用 document.createElement('script') 动态生产script
+    
+    
+    // 服务器端返回的remote.js脚本
+    showTable ({ name: 'Fred', age: 22 })
+    
+    // 2.  Cross-Origin Resource Sharing(CORS)
+    // 在跨域服务器中的响应头部中加入`Access-Control-Allow-Origin`表示服务器允许哪些域可以访问该资源
+    // Access-Control-Allow-Origin: <origin> | *
+    // 包括该字段之外， 还有`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age` 等等字段配合达到更强大的效果
+    
+    // 3. 父子域之间还可以考虑 `document.domain`,  `location.hash`等方式
+    
+    // 4. 还可以靠同源服务器代理（转发）请求。
+  ```
 * `doctype`(文档类型) 的作用是什么？
   - http://padding.me/blog/2014/07/04/mode-or-standard/
 * 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么？
@@ -256,4 +289,5 @@ console.log('three');
 
 ## 来源
 https://github.com/h5bp/Front-end-Developer-Interview-Questions
+
 https://zhuanlan.zhihu.com/p/54397576
