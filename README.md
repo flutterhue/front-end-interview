@@ -1,19 +1,6 @@
-## 来源
-https://github.com/h5bp/Front-end-Developer-Interview-Questions
+## 前端面试题收录
 
-## <a name='toc'>目录</a>
-
-  1. [常见问题](#general-questions)
-  1. [HTML 相关问题](#html-questions)
-  1. [CSS 相关问题](#css-questions)
-  1. [JS 相关问题](#js-questions)
-  1. [测试相关问题](#testing-questions)
-  1. [效能相关问题](#performance-questions)
-  1. [网络相关问题](#network-questions)
-  1. [代码相关问题](#coding-questions)
-  1. [趣味问题](#fun-questions)
-
-#### <a name='general-questions'>常见问题：</a>
+#### 常见问题
 
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
@@ -21,7 +8,7 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
 
   优雅降级（Graceful Degradation）：一开始就构建站点的完整功能，然后针对浏览器测试和修复。比如一开始使用 CSS3 的特性构建了一个应用，然后逐步针对各大浏览器进行 hack 使其可以在低版本浏览器上正常浏览。
   ```
-* 你如何对网站的文件和资源进行优化？
+* 你如何对网站的文件和资源进行优化？/ 请说出三种减少页面加载时间的方法。(加载时间指感知的时间或者实际加载时间)
   + CDN (Content Distribution Network)
   + 尽可能减少http请求次数，将css, js, 图片各自合并 
   + 添加Expire/Cache-Control头
@@ -29,17 +16,11 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
   + 最小化css, js，减小文件体积
 * 浏览器同一时间可以从一个域名下载多少资源？
   + https://www.zhihu.com/question/20474326
-* 请说出三种减少页面加载时间的方法。(加载时间指感知的时间或者实际加载时间)
-* 如果你参与到一个项目中，发现他们使用 Tab 来缩进代码，但是你喜欢空格，你会怎么做？
+
 * 请写一个简单的幻灯效果页面。
-* 如果今年你打算熟练掌握一项新技术，那会是什么？
-* 请谈谈你对网页标准和标准制定机构重要性的理解。
-* 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
+
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
-
-#### <a name='html-questions'>HTML 相关问题：</a>
-
 * `doctype`(文档类型) 的作用是什么？
   - http://padding.me/blog/2014/07/04/mode-or-standard/
 * 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么？
@@ -60,7 +41,7 @@ https://github.com/h5bp/Front-end-Developer-Interview-Questions
   - `<script>` 同步加载, 加载完成后立即执行
   - `<script async>` 异步加载, 加载立即执行, 不考虑多个script的先后顺序
   - `<script defer>` 异步加载, 执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成, 但是执行会按照声明script的顺序.
-* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗？
+* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗？/ 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
   - https://www.zhihu.com/question/309982596
   - css加载放HEAD防止FOUC(flash of unstyled content), 但是如果css过大可能导致白屏时间过长可以考虑放一部分非首屏可见元素的css在末尾.
   - js加载放末尾防止白屏时间过长. 但一些统计类js, 或是要网页面中添加内容的js可以考虑放在开头.
@@ -272,3 +253,7 @@ console.log('three');
 * 你有什么业余项目吗？是哪种类型的？
 * 你最爱的 IE 特性是什么？
 * 你对咖啡有没有什么喜好？
+
+## 来源
+https://github.com/h5bp/Front-end-Developer-Interview-Questions
+https://zhuanlan.zhihu.com/p/54397576
