@@ -57,12 +57,23 @@
     
     // 4. 还可以靠同源服务器代理（转发）请求。
   ```
-* `doctype`(文档类型) 的作用是什么？
-  - http://padding.me/blog/2014/07/04/mode-or-standard/
-* 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么？
-  - https://frontenddev.org/link/do-you-know-what-a-doctype-what-document-model-is.html
-* HTML 和 XHTML 有什么区别？
-  - https://www.zhihu.com/question/19783105/answer/13113567
+* `doctype`(文档类型) 的作用是什么 / 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么
+  - DOCTYPE 主要用来引用该标记文档的 Document Type Definition (DTD), 以此告诉浏览器用什么样的解析规则来解析该文档.
+  - 因为HTML4.01基于SGML(Standard Generalized Markup Language), 所以DOCTYPE需要对DTD进行引用
+    + 4.01 严格模式 `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">`
+    + 4.01 过渡模式 `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"  "http://www.w3.org/TR/html4/loose.dtd">`       + 4.01 frameset模式 `<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN"  "http://www.w3.org/TR/html4/frameset.dtd">`
+  - HTML5并不基于SGML，所以不需要引用DTD，所以直接写为  `<!DOCTYPE html>`
+  - 以上都属于浏览器的`standards mode`， 但是如果没有DOCTYPE或者DOCTYPE语法错误会让浏览器进入`quirks mode`
+  - 在“标准模式”(standards mode) 页面按照 HTML 与 CSS 的定义渲染，而在“怪异模式(quirks mode) 模式”中则尝试模拟更旧的浏览器的行为。 一些浏览器（例如，那些基于 Mozilla 的 Gecko 渲染引擎的，或者 Internet Explorer 8 在 strict mode 下）也使用一种尝试于这两者之间妥协的“近乎标准”(almost standards) 模式，实施了一种表单元格尺寸的怪异行为，除此之外符合标准定义
+  ```
+    1. 盒模型不同
+      `standard mode`是 `content-box` 
+      `quirks mode`是 `border-box`
+    2. 行内元素的宽高
+      `standard mode`不能设置
+      `quirks mode`是可以设置
+  
+  ```
 * 如果页面使用 'application/xhtml+xml' 会有什么问题吗？
   - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
 * 使用 `data-` 属性的好处是什么？
