@@ -231,27 +231,39 @@
 * 什么是 HTTP method？请罗列出你所知道的所有 HTTP method，并给出解释。
 * 请解释 HTTP status 301 与 302 的区别？
 
-#### <a name='coding-questions'>代码相关的问题：</a>
 
 *问题：`foo`的值是什么？*
 ```javascript
 var foo = 10 + '20';
+
+// '1020'
 ```
 
 *问题：如何实现以下函数？*
 ```javascript
 add(2, 5); // 7
 add(2)(5); // 7
+
+function add (a, b) {
+	if (b === undefined) {
+		return b => a + b
+  }
+	return a + b
+}
 ```
 
 *问题：下面的语句的返回值是什么？*
 ```javascript
 "i'm a lasagna hog".split("").reverse().join("");
+
+// "goh angasal a m'i"
 ```
 
 *问题：`window.foo`的值是什么？*
 ```javascript
 ( window.foo || ( window.foo = "bar" ) );
+
+// "bar"
 ```
 
 *问题：下面两个 alert 的结果是什么？*
@@ -264,37 +276,18 @@ var foo = "Hello";
 alert(foo + bar);
 ```
 
-*问题：`foo.length`的值是什么？*
-```javascript
-var foo = [];
-foo.push(1);
-foo.push(2);
-```
-
 *问题：`foo.x`的值是什么？*
 ```javascript
-var foo = {n: 1};
+var foo = { n: 1 };
 var bar = foo;
-foo.x = foo = {n: 2};
+foo.x = foo = { n: 2 };
+
+// foo 
+// { n: 2 }
+//
+// bar
+// { n: 1, x: { n: 2 } }
 ```
-
-*问题：下面代码的输出是什么？*
-```javascript
-console.log('one');
-setTimeout(function() {
-  console.log('two');
-}, 0);
-console.log('three');
-```
-
-#### <a name='fun-questions'>趣味问题：</a>
-
-* 你最近写过什么的很酷的项目吗？
-* 在你使用的开发工具中，最喜欢哪些方面？
-* 谁使你踏足了前端开发领域？
-* 你有什么业余项目吗？是哪种类型的？
-* 你最爱的 IE 特性是什么？
-* 你对咖啡有没有什么喜好？
 
 ## 来源
 https://github.com/h5bp/Front-end-Developer-Interview-Questions
