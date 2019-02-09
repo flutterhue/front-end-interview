@@ -15,7 +15,10 @@
   + 启用Gzip压缩文件
   + 最小化css, js，减小文件体积
 * 浏览器同一时间可以从一个域名下载多少资源？
-  + https://www.zhihu.com/question/20474326
+  + 即使最新的也在8以内, 目的主要是安全以及性能因素
+  + 并发过多请求容易超出服务器阈值而被BAN.
+  + 有利于浏览器复用现有连接 (keep alive技术)
+  + 详见 https://www.zhihu.com/question/20474326
 
 * 请写一个简单的幻灯效果页面。
 
@@ -79,7 +82,18 @@
 * 使用 `data-` 属性的好处是什么？
   - 自定义的data Chrome中可以用dataset来取得, 比如 data-house-id="13"  xx.dataset.houseId = 13
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
-  - https://github.com/lmk123/blog/issues/66
+  - 
+  - 都是同源的, 同时都保存在客户端
+  - 可储存大小
+    + cookies 大小不超过4k
+    + sessionStorage, localStorage 大小限制可以达到5M甚至更多
+  - 过期时间长短
+    + cookie 在设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
+    + sessionStorage 数据在当前浏览器窗口关闭后自动删除, 在同一session间共享（https://github.com/lmk123/blog/issues/66）
+    + localStorage 存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
+  - 是否传递
+    + 同时每次http请求都会自动带上cookie
+    + sessionStorage, localStorage 则只在本地保存
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
   - https://segmentfault.com/q/1010000000640869
   - `<script>` 同步加载, 加载完成后立即执行
@@ -99,6 +113,11 @@
   - id优先级更高
 * 请问 "resetting" 和 "normalizing" CSS 之间的区别？你会如何选择，为什么？
   - https://www.jianshu.com/p/a7b9e2d20b73
+  - 目的都是
+  - CSS重置更激进, 对浏览器的默认样式进行了一些重置, 一般是通过`* 通配符选择器`来达到目的, 最终使得CSS样式有一个统一的基准
+  - CSS一般化修复了浏览器的自身bug并保持浏览器的一致性, 宗旨是保护有用的浏览器默认样式而不是完全去掉它们
+  - `reset`的缺点在于浏览器调试工具中大段大段的继承链, 样式调试变得复杂
+  - `normalized`保护了有价值的默认值, 修复了浏览器的bug (这往往超出了Reset所能做到的范畴).
 * 请解释浮动 (Floats) 及其工作原理。
   - 强制block, 同时跳出文本流浮动元素从网页的正常流动中移出，但保留了部分的流动性，会影响其他元素的定位（比如文字会围绕着浮动元素）。这一点与绝对定位不同，绝对定位的元素完全从文档流脱离
   - 如果浮动元素的父元素只包含浮动元素，那么该父元素的高度会坍塌为0，我们可以通过清除（clear）从浮动元素后到父元素关闭前之间的浮动来修复这个问题(clear: both | left | right)
@@ -120,6 +139,8 @@
   ```
   - 父元素添加overflow: hidden | auto 或其他能够构成BFC的属性
 * 请解释 CSS sprites，以及你要如何在页面或网站中实现它。
+  - 为了节省http请求数量, 提高网页性能, 将多张素材图片合并到一张大图中
+  - 可维护差, 每次改动都需要图片
 * 你最喜欢的图片替换方法是什么，你如何选择使用。
 * 你会如何解决特定浏览器的样式问题？
 * 如何为有功能限制的浏览器提供网页？
