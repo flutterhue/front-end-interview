@@ -207,6 +207,53 @@
 * 为什么响应式设计 (responsive design) 和自适应设计 (adaptive design) 不同？
 * 你有兼容 retina 屏幕的经历吗？如果有，在什么地方使用了何种技术？
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
+* JavaScript中对象的属性定义与赋值的区别
+ - http://www.cnblogs.com/ziyunfei/archive/2012/10/31/2738728.html
+    ```js
+        const person = {}
+        person.age = 12 // 赋值
+        Object.defineProperty(person, "name", propDesc) // 定义
+
+        // 背景知识
+        // js有三种属性
+        // 1. named data properties: 有确定的值, 最常见
+        // 2. named accessor properties: 通过getter和setter读取以及赋值, 实际值得存放位置不确定, 甚至可以是个临时计算量
+        // 3. internal properties: 内部属性, 比如每个对象都有一个内部属性[[Prototype]]
+        // 下文只讨论前两种
+        
+        // 每个属性有四个特征（括号里是使用定义创建属性时, 如果忽略某个特征, 该特征的默认值）
+        // named data properties: 
+        //    1. `value`(undefined): 值
+        //    2. `writable`(false): 决定值是否可改变
+        
+        // named accessor properties: 
+        //    1. `get`(undefined): 取值时将调用
+        //    2. `set`(undefined): 赋值时讲调用
+        
+        // shared properties:
+        //    1. `enumerable`(false): 是否可枚举,如果为false,这个属性在某些操作下是不可见的,比如for...in和Object.keys()
+        //    2. `configurable`(false): 是否可配置, 如果一个属性是不可配置的, 则该属性的所有特性(除了[[Value]])都不可改变.
+        
+                
+        // 有啥区别？？
+        
+        //  `Object.defineProperty(person, "name", propDesc)` 
+        //  若`name`属性不存在, 则创建该属性, 具体特征由参数`propDesc`对象指明, 如果没有指明的直接按照上述括号中的默认值
+        //  若已存在且属性可配置, 则修改`propDesc`对象中指明的属性特征, 其他特征保持不变
+        //  但若属性是不可配置的, 则只能修改`value`, 如果`writable`是false, 则连value都不可修改
+        
+        
+        //  person.age = 12 // 赋值
+        //  一般来讲, 若`age`不存在, 该操作等效于`Object.defineProperty(person, "age", { value: 12, writable: true, enumerable: true, configurable: true })`
+        //  若存在, 则直接修改值
+        //  但有以下情况赋值不生效:
+        //    1. 如果在原型链上存在一个名为P的只读属性(只读的数据属性或者没有setter的访问器属性
+        //    2. 如果在原型链上存在一个名为P的且拥有setter的访问器属性:则调用这个setter.
+        //    3. `age`已经存在且`age`属性存在`set`方法, 则具体行为依`set`而定
+        
+    ```
+* JavaScript 内部属性
+
 * 手写函数防抖和函数节流
 	```js
 		// 防抖和节流多用于页面滚动事件等短时间内触发频率较高的事件, 关键是限制函数调用次数来提高性能
@@ -219,7 +266,7 @@
 			return function () {
 				clearTimeout(timeout)
 				timeout = setTimeout (handle, delay)
-    			}
+    		}
 		}
 
 		// 节流
@@ -239,6 +286,10 @@
 				if (!previousDate) previousDate = currentDate
 		    }
 		}
+
+        // 尝试去掉注释 滑动页面 观察效果
+        // window.onscroll = debounce (e => { console.log(1) }, 1000)
+        // window.onscroll = throttle (e => { console.log(1) }, 1000)
 	```
 * 请解释事件代理 (event delegation)。
 * 请解释 JavaScript 中 `this` 是如何工作的。
