@@ -114,7 +114,7 @@
   - CSS重置更激进, 对浏览器的默认样式进行了一些重置, 一般是通过`* 通配符选择器`来达到目的, 最终使得CSS样式有一个统一的基准
   - CSS一般化修复了浏览器的自身bug并保持浏览器的一致性, 宗旨是保护有用的浏览器默认样式而不是完全去掉它们
   - `reset`的缺点在于浏览器调试工具中大段大段的继承链, 样式调试变得复杂
-  - `normalized`保护了有价值的默认值, 修复了浏览器的bug (这往往超出了Reset所能做到的范畴).
+  - `normalized`保护了有价值的默认值(这样不需要为所有的排版元素都添加样式), 同时修复了浏览器的bug (这往往超出了Reset所能做到的范畴).
 * 请解释浮动 (Floats) 及其工作原理。
   - 强制block, 同时跳出文本流浮动元素从网页的正常流动中移出，但保留了部分的流动性，会影响其他元素的定位（比如文字会围绕着浮动元素）。这一点与绝对定位不同，绝对定位的元素完全从文档流脱离
   - 如果浮动元素的父元素只包含浮动元素，那么该父元素的高度会坍塌为0，我们可以通过清除（clear）从浮动元素后到父元素关闭前之间的浮动来修复这个问题(clear: both | left | right)
@@ -124,14 +124,15 @@
   - https://www.zhangxinxu.com/wordpress/2016/01/understand-css-stacking-context-order-z-index/
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
   - http://www.cnblogs.com/lhb25/p/inside-block-formatting-ontext.html
+  - 消边距折叠 https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing
 * 列举不同的清除浮动的技巧，并指出它们各自适用的使用场景。
   - 末尾添加一个空div作为兄弟：`<div style="clear: both;"/>`
   - 给父元素添加一个伪类
   ```css
     .clearfix::after {
-    content: '',
-    display: block;
-    clear: both;
+	    content: '',
+	    display: block;
+	    clear: both;
     }
   ```
   - 父元素添加overflow: hidden | auto 或其他能够构成BFC的属性
@@ -140,8 +141,52 @@
   - 可维护差, 每次改动都需要图片
 * 你用过栅格系统 (grid system) 吗？如果使用过，你最喜欢哪种？
   - TODO
+  - https://www.zcfy.cc/article/how-to-build-a-responsive-grid-system-zell-liew
 * 请写一个简单的幻灯效果页面。
   - TODO
+  - 
+* 水平居中的方式
+  - 对于行内元素, 可以使用为其容器添加 `text-align: center`
+  - 对于有宽度的块级元素, 可以为其自身添加 `margin: 0 auto`
+  - 为其自身添加 `position: relative; left: 50%; transform: translate(-50%, 0)` 也可以
+  - 为其容器添加 `display: flex; justify-content: center;` 也可以
+* 垂直居中的方式
+  ```css
+  	/* 对于单行文本 */
+	.wrapper {
+		height: 100px;
+		line-height: 100px;
+
+	}
+	
+	/* 对于块级元素 */
+  	.wrapper {
+		display: relative
+	}
+	.wrapper > child {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+	}
+	
+	/* 对于块级元素 */
+	.wrapper {
+		display: relative
+	}
+	.wrapper > child {
+		position: absolute;
+		top: 50%;
+		transform: translate(0, -50%);
+	}
+  ```
+* 有哪些行内替换元素, 他们有什么特点, 和行内元素有什么区别
+  - 例如`img`, `input`根据标签的属性显示内容, 可以设置四个方向上的`padding, margin`以及`width, height`
+  - 行内元素例如`span`, `a`竖直方向上的`padding-top、padding-bottom、margin-top、margin-bottom`无效果, 水平方向有效果
+  - 实际上行内元素的`padding-top、padding-bottom`从视觉上确实是撑开了(例如添加背景), 但实际上并不对周围元素产生影响
+* `vertical-align`有什么作用
+  - http://www.cnblogs.com/hykun/p/3937852.html
+  - https://zhuanlan.zhihu.com/p/28626505
 * 你用过媒体查询，或针对移动端的布局/CSS 吗？
 * 你熟悉 SVG 样式的书写吗？
 * 如何优化网页的打印样式？
@@ -163,8 +208,37 @@
 * 你有兼容 retina 屏幕的经历吗？如果有，在什么地方使用了何种技术？
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
 * 手写函数防抖和函数节流
-	```
+	```js
+		// 防抖和节流多用于页面滚动事件等短时间内触发频率较高的事件, 关键是限制函数调用次数来提高性能
+		// 不同点在于 防抖只在用户操作结束之后触发一次 例如input输入验证
+		// 而节流在用户操作过程中仍不断触发, 但以较低的频率 例如js动画
+		
+		// 防抖
+		function debounce (handle, delay) {
+			let timeout 
+			return function () {
+				clearTimeout(timeout)
+				timeout = setTimeout (handle, delay)
+    			}
+		}
 
+		// 节流
+		function throttle (handle, threshold) {
+			let timeout
+			let previousDate
+			return function () {
+				clearTimeout(timeout)
+				let currentDate = new Date()
+
+				if (currentDate - previousDate >= threshold) {
+					handle()
+					previousDate = 0
+				} else {
+					timeout = setTimeout (handle, threshold)
+				}
+				if (!previousDate) previousDate = currentDate
+		    }
+		}
 	```
 * 请解释事件代理 (event delegation)。
 * 请解释 JavaScript 中 `this` 是如何工作的。
