@@ -1,7 +1,5 @@
 ## 前端面试题收录
 
-#### 常见问题
-
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
   渐进增强（Progressive Enhancement）：一开始就针对低版本浏览器进行构建页面，完成基本的功能，然后再针对高级浏览器进行效果、交互、追加功能达到更好的体验。
@@ -19,11 +17,26 @@
   + 并发过多请求容易超出服务器阈值而被BAN.
   + 有利于浏览器复用现有连接 (keep alive技术)
   + 详见 https://www.zhihu.com/question/20474326
-
+* 什么是viewport, 有什么作用
+  + https://www.cnblogs.com/2050/p/3877280.html
+  + TODO
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
   + CSS动画更流畅，JS易导致页面掉帧。
   + CSS兼容性差
+* `package.json`中库的版本号`^`和`~`的区别
+  ```json
+  "dependencies": {
+    "bluebird": "^3.3.4",
+    "body-parser": "~1.15.2"
+  }
+  ```
+  - 1.15.2对应就是MAJOR,MINOR,PATCH：1是marjor version；15是minor version；2是patch version。
+  - MAJOR：这个版本号变化了表示有了一个不可以和上个版本兼容的大更改。
+  - MINOR：这个版本号变化了表示有了增加了新的功能，并且可以向后兼容。
+  - PATCH：这个版本号变化了表示修复了bug，并且可以向后兼容。
+  - 波浪符号（~）：他会更新到当前minor version（也就是中间的那位数字）中最新的版本。放到我们的例子中就是：body-parser:~1.15.2，这个库会去匹配更新到1.15.x的最新版本，如果出了一个新的版本为1.16.0，则不会自动升级。波浪符号是曾经npm安装时候的默认符号，现在已经变为了插入符号。
+  - 插入符号（^）：这个符号就显得非常的灵活了，他将会把当前库的版本更新到当前major version（也就是第一位数字）中最新的版本。放到我们的例子中就是：bluebird:^3.3.4，这个库会去匹配3.x.x中最新的版本，但是他不会自动更新到4.0.0。
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
   + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
   + `<script>``<img>``<iframe>``<link>``<video>``<audio>``等带有`src`属性的标签默认支持跨域
@@ -72,8 +85,7 @@
       `quirks mode`是 `border-box`
     2. 行内元素的宽高
       `standard mode`不能设置
-      `quirks mode`是可以设置
-  
+      `quirks mode`是可以设置 
   ```
 * 如果页面使用 'application/xhtml+xml' 会有什么问题吗？
   - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
@@ -104,7 +116,37 @@
   - https://stackoverflow.com/questions/33651166/what-is-progressive-rendering
   - 目的:尽快让用户看到内容
   - 手段: 图片懒加载, 可视化内容优先(Server Side Rendering, SSR 只返回首屏可视化部分的html，已由服务器端渲染好)
+* 什么`mobile first`, 为什么需要`mobile first`
+    ```
+        // 区别在于`mobile-first`首先考虑移动端布局然后在这个基础上在添加以及改写样式来适配桌面端
+        
+        /* mobile-first */ 
+        // This applies from 0px to 600px
+        body {
+          background: red;
+        }
 
+        // This applies from 600px onwards
+        @media (min-width: 600px) {
+          body {
+            background: green;
+          }
+        }
+        
+        /* desktop-first */ 
+        // This applies from 600px onwards
+        body {
+          background: green;
+        }
+
+        // This applies from 0px to 600px
+        @media (max-width: 600px) {
+          body {
+            background: red;
+          }
+        }
+    ```
+    - 这样做的原因是: 通常移动端的布局会更加简单, 移动端优先的方式有利于更好地复用以及简化代码
 * CSS 中类 (classes) 和 ID 的区别。
   - id用来标记一个 类用来标记很多个  
   - id优先级更高
@@ -140,8 +182,8 @@
   - 为了节省http请求数量, 提高网页性能, 将多张素材图片合并到一张大图中
   - 可维护差, 每次改动都需要图片
 * 你用过栅格系统 (grid system) 吗？如果使用过，你最喜欢哪种？
-  - TODO
-  - https://www.zcfy.cc/article/how-to-build-a-responsive-grid-system-zell-liew
+  - css3 grid https://www.zhangxinxu.com/wordpress/2018/11/display-grid-css-css3/
+  - 自制 grid https://www.zcfy.cc/article/how-to-build-a-responsive-grid-system-zell-liew
 * 请写一个简单的幻灯效果页面。
   - TODO
   - 
