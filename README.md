@@ -19,7 +19,9 @@
   + 详见 https://www.zhihu.com/question/20474326
 * 什么是viewport, 有什么作用
   + https://www.cnblogs.com/2050/p/3877280.html
-  + TODO
+  + 首先设备中的1px和css中的1px不一定相等, 前者是物理像素后者是独立像素, 在现代高分屏幕上通常一个独立像素又多个物理像素表示
+  + window.devicePixelRatio 可以得到1个独立像素到底由几个物理像素表示
+  + 
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
   + CSS动画更流畅，JS易导致页面掉帧。
@@ -230,8 +232,32 @@
   - http://www.cnblogs.com/hykun/p/3937852.html
   - https://zhuanlan.zhihu.com/p/28626505
 * 你用过媒体查询，或针对移动端的布局/CSS 吗？
-* 你熟悉 SVG 样式的书写吗？
+  ```js
+      if (window.matchMedia("(min-width: 400px)").matches) {
+        /* The viewport is at least 400 pixels wide */
+      } else {
+        /* The viewport is less than 400 pixels wide */
+      }
+  ```
+  ```css
+      @media (min-width: 900px) {
+          article {
+            padding: 1rem 3rem;
+          }
+      }
+  ```
 * 如何优化网页的打印样式？
+  - https://blog.csdn.net/xujie_0311/article/details/42271273
+  ```css
+      // 以下两种方式都可以
+      <link rel="stylesheet" type="text/css" media="screen" href="screenstyles.css" />
+	  <style type="text/css">
+		@import url("screenstyles.css") screen;
+		 @media print {
+		     /* 打印时使用的样式放置在此 *
+		}
+	  </style>
+  ```
 * 在书写高效 CSS 时会有哪些问题需要考虑？
 * 使用 CSS 预处理器的优缺点有哪些？
   * 请描述你曾经使用过的 CSS 预处理器的优缺点。
