@@ -17,15 +17,24 @@
   + 并发过多请求容易超出服务器阈值而被BAN.
   + 有利于浏览器复用现有连接 (keep alive技术)
   + 详见 https://www.zhihu.com/question/20474326
-* 什么是viewport, 有什么作用
+* 什么是viewport, 有什么作用??
   + https://www.cnblogs.com/2050/p/3877280.html
-  + 首先设备中的1px和css中的1px不一定相等, 前者是物理像素后者是独立像素, 在现代高分屏幕上通常一个独立像素又多个物理像素表示
-  + window.devicePixelRatio 可以得到1个独立像素到底由几个物理像素表示
-  + 
+  + 首先设备中的1px和css中的1px不一定相等, 前者是物理像素后者是独立像素, 在现代高分屏幕(1080x1920)上通常一个独立像素由多个物理像素表示
+  + window.devicePixelRatio 表示1个独立像素所占用的物理像素数量
+  + 浏览器默认有一个 `layout viewport`, 通常来说大小为`980px`(css对应的px宽度)
+  + `visual viewport` 是浏览器的可视宽度, 在移动设备上通常小于`layout viewport`, 这也是为什么有些页面会在手机上出现横向滚动条
+  + `ideal viewport`是移动端理想的viewport, 例如iphoneX该值为`350px`, 它的宽度约等于屏幕的实际宽度
+  + 使用以下标签`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">` 可以使得`layout viewport`的大小等于`ideal viewport`, 一般出现在专门对移动端做过适配的页面.
+* `window.innerWidth`和 `document.documentElement.clientWidth`的区别
+  + ???
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
   + CSS动画更流畅，JS易导致页面掉帧。
   + CSS兼容性差
+* `requestAnimationFrame`是什么, 有什么作用
+  + 用来代替`setTimeout`实现动画, 于requestAnimationFrame的功效只是一次性的，所以若想达到动画效果，则必须连续不断的调用requestAnimationFrame，就像我们使用setTimeout来实现动画所做的那样, 但是它的性能相对来说更好, 原因如下
+    + 会把每一帧中的所有DOM操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+    + 在隐藏或不可见的元素中，requestAnimationFrame将不会进行重绘或回流，这当然就意味着更少的的cpu，gpu和内存使用量
 * `package.json`中库的版本号`^`和`~`的区别
   ```json
   "dependencies": {
