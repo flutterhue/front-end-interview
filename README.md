@@ -26,7 +26,22 @@
   + `ideal viewport`是移动端理想的viewport, 例如iphoneX该值为`350px`, 它的宽度约等于屏幕的实际宽度
   + 使用以下标签`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">` 可以使得`layout viewport`的大小等于`ideal viewport`, 一般出现在专门对移动端做过适配的页面.
 * `window.innerWidth`和 `document.documentElement.clientWidth`的区别
-  + ???
+  + ??? https://zhuanlan.zhihu.com/p/37031348
+  ```
+  	
+ 	// 设备屏幕的宽高，可用宽高都包含在该对象中
+	document.screen / screen
+	
+	// 如果缩放原地爆炸 以下结论不一定成立（浏览器有差异）
+	
+	// 浏览器视窗宽高 不包括滚动条
+	document.documentElement.clientWidth
+	document.documentElement.clientHeight
+	
+	// 浏览器视窗宽高 包括滚动条
+	window.innerWidth
+	window.innerHeight
+  ```
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
   + CSS动画更流畅，JS易导致页面掉帧。
@@ -196,8 +211,13 @@
   - css3 grid https://www.zhangxinxu.com/wordpress/2018/11/display-grid-css-css3/
   - 自制 grid https://www.zcfy.cc/article/how-to-build-a-responsive-grid-system-zell-liew
 * 请写一个简单的幻灯效果页面。
-  - TODO
-  - 
+  - TODO 
+* 什么是`rem`和`em`有什么区别
+  - https://yanhaijing.com/css/2017/09/29/principle-of-rem-layout/
+  - em作为font-size的单位时，其代表父元素的字体大小，em作为其他属性单位时，代表自身字体大小
+  - rem作用于非根元素时，相对于根元素字体大小；rem作用于根元素字体大小时，相对于其出初始字体大小
+  - rem可以用来做弹性布局, 通过设置根元素的字体大小来作为其他元素大小的单位.
+  - 但更好的方案是 vw —— 视口宽度的 1/100；vh —— 视口高度的 1/10
 * 水平居中的方式
   - 对于行内元素, 可以使用为其容器添加 `text-align: center`
   - 对于有宽度的块级元素, 可以为其自身添加 `margin: 0 auto`
@@ -268,9 +288,7 @@
 	  </style>
   ```
 * 在书写高效 CSS 时会有哪些问题需要考虑？
-* 使用 CSS 预处理器的优缺点有哪些？
-  * 请描述你曾经使用过的 CSS 预处理器的优缺点。
-* 如果设计中使用了非标准的字体，你该如何去实现？
+
 * 请解释浏览器是如何判断元素是否匹配某个 CSS 选择器？
 * 请描述伪元素 (pseudo-elements) 及其用途。
 * 请解释你对盒模型的理解，以及如何在 CSS 中告诉浏览器使用不同的盒模型来渲染你的布局。
@@ -383,9 +401,21 @@
         // window.onscroll = throttle (e => { console.log(1) }, 1000)
 	```
 * 请解释事件代理 (event delegation)。
+  - 事件委托是将事件监听器添加到父元素，而不是每个子元素单独设置事件监听器。当触发子元素时，事件会冒泡到父元素，监听器就会触发
+  - 这样一来只需要为父元素编写事件处理函数, 有利于统一管理, 同时同类元素无需分别添加事件处理
+* JavaScript的sort方法内部使用的什么排序？
+  - Chrome 查过10用快排否则用插入排序， Firefox 是归并
 * 请解释 JavaScript 中 `this` 是如何工作的。
+  - new Person(), Person函数内部this 指向新对象
+  - apply, call, bind强行绑定
+  - fuck.something(), somthing函数内部this指向fuck
+  - 不符合上述, this指向全局, 若为strict模式, 则指向undefined
+  - 箭头函数中this永远指向创建该函数时上下文中的this, 且无法修改
 * 请解释原型继承 (prototypal inheritance) 的原理。
+  - 每个对象都有原型, 对象访问属性时, 若未找到, 会沿着原型链一直往上找
+  - 根据这个原理, 我们可以让被继承对象成为继承对象的原型即可实现继承的效果
 * 你怎么看 AMD vs. CommonJS？
+  - 
 * 请解释为什么接下来这段代码不是 IIFE (立即调用的函数表达式)：`function foo(){ }();`.
   * 要做哪些改动使它变成 IIFE?
 * 描述以下变量的区别：`null`，`undefined` 或 `undeclared`？
