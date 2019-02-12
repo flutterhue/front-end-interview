@@ -1,5 +1,36 @@
 ## 前端面试题收录
+* 浏览器渲染过程，回流重绘等等，load、DOMContentLoaded等等事件的触发顺序
+  - https://juejin.im/post/5b2e352ef265da59af409832
+  - 渲染过程
+    1. url 解析: url -> ip(by dns) -> 建立TCP连接 -> 发送http request -> 收到http request
+    2. html 解析: html构建DOM Tree, CSS构建CSSOM(Rule Tree), 然后合并为rendering tree
+    3. layout: 基于rendering tree, 浏览器开始计算各个节点内容在屏幕上的位置
+    4. paint: 按照上一步计算的结果在浏览器上进行绘制
+    5. script 解析
+  - 几个概念
+    + layout(布局)或者reflow(回流), 某个部分发生了变化影响了布局，渲染树需要重新计算，计算出每一个渲染对象的位置和尺寸，将其安置在浏览器窗口的正确位置，而有些时候我们会在文档布局完成后对DOM进行修改，这时候可能需要重新进行布局，也可称其为回流，本质上还是一个布局的过程，每一个渲染对象都有一个布局或者回流方法，实现其布局或回流。
+    + paint(绘制)或repaint(重绘)浏览器UI组件将遍历渲染树并调用渲染对象的绘制（paint）方法，将内容展现在屏幕上，也有可能在之后对DOM进行修改，需要重新绘制渲染对象，也就是重绘，绘制和重绘的关系可以参考布局和回流的关系. 改变了某个元素的背景颜色，文字颜色等，不影响元素周围或内部布局的属性，将只会引起浏览器的repaint，根据元素的新属性重新绘制，使元素呈现新的外观。重绘不会带来重新布局，并不一定伴随重排；Reflow要比Repaint更花费时间，也就更影响性能。所以在写代码的时候，要尽量避免过多的Reflow。
+    + DOM的增加删除移动, 页面内容的变更, 浏览器窗口的大小变化或者滚动等会影响节点位置的操作都将导致reflow.
+    + 只发送重绘通常来说是一下几个元素样式发送了变化`color`, `background-color`, `visibility`
+  - 如果避免(过多不必要的回流和重绘)
+    + 将动画效果应用到position属性为absolute或fixed的元素上（脱离文档流）
+    + 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性
+    + 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中, 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘
+    + 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来
+     ```
+        现代浏览器会对频繁的回流或重绘操作进行优化：
+        浏览器会维护一个队列，把所有引起回流和重绘的操作放入队列中，如果队列中的任务数量或者时间间隔达到一个阈值的，浏览器就会将队列清空，进行一次批处理，这样可以把多次回流和重绘变成一次。
+        当你访问以下属性或方法时，浏览器会立刻清空队列：
 
+        clientWidth、clientHeight、clientTop、clientLeft
+        offsetWidth、offsetHeight、offsetTop、offsetLeft
+        scrollWidth、scrollHeight、scrollTop、scrollLeft
+        width、height
+        getComputedStyle()
+        getBoundingClientRect()
+
+        因为队列中可能会有影响到这些属性或方法返回值的操作，即使你希望获取的信息与队列中操作引发的改变无关，浏览器也会强行清空队列，确保你拿到的值是最精确的。
+     ```
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
   渐进增强（Progressive Enhancement）：一开始就针对低版本浏览器进行构建页面，完成基本的功能，然后再针对高级浏览器进行效果、交互、追加功能达到更好的体验。
