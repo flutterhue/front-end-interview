@@ -39,25 +39,33 @@
   + `unload` 在用户已经离开时触发，我们在这个阶段仅可以做一些没有延迟的操作，由于种种限制，很少被使用
   + `defer`会在`DOMContentLoaded`触发之前就执行, 但是`async`不确定, 只是在下载完成之后立刻执行。
   + 考虑到上述情况, 有时候我们还需要确定页面的状态：
-  ```
-  <script>
-  function log(text) { /* output the time and message */ }
-  log('initial readyState:' + document.readyState);
+  ```html
+    <script>
+    function log(text) { /* output the time and message */ }
+    log('initial readyState:' + document.readyState);
 
-  document.addEventListener('readystatechange', () => log('readyState:' + document.readyState));
-  document.addEventListener('DOMContentLoaded', () => log('DOMContentLoaded'));
+    document.addEventListener('readystatechange', () => log('readyState:' + document.readyState));
+    document.addEventListener('DOMContentLoaded', () => log('DOMContentLoaded'));
 
-  window.onload = () => log('window onload');
-</script>
+    window.onload = () => log('window onload');
+    </script>
 
-<iframe src="iframe.html" onload="log('iframe onload')"></iframe>
+    <iframe src="iframe.html" onload="log('iframe onload')"></iframe>
 
-<img src="http://en.js.cx/clipart/train.gif" id="img">
-<script>
-  img.onload = () => log('img onload');
-</script>
-* `document.readyState` 在 `DOMContentLoaded` 前一刻变为 `interactive`，这两个事件可以认为是同时发生。
-* `document.readyState` 在所有资源加载完毕后（包括 `iframe` 和 `img`）变成 `complete`，我们可以看到`complete`、 `img.onload` 和 `window.onload` 几乎同时发生，区别就是 `window.onload` 在所有其他的 `load` 事件之后执行
+    <img src="http://en.js.cx/clipart/train.gif" id="img">
+    <script>
+      img.onload = () => log('img onload');
+    </script>
+    // 输出如下
+    * `[1] initial readyState:loading`
+    * `[2] readyState:interactive`
+    * `[2] DOMContentLoaded`
+    * `[3] iframe onload`
+    * `[4] readyState:complete`
+    * `[4] img onload`
+    * `[4] window onload`
+  `document.readyState` 在 `DOMContentLoaded` 前一刻变为 `interactive`，这两个事件可以认为是同时发生。
+  `document.readyState` 在所有资源加载完毕后（包括 `iframe` 和 `img`）变成 `complete`，我们可以看到`complete`、 `img.onload` 和         `window.onload` 几乎同时发生，区别就是 `window.onload` 在所有其他的 `load` 事件之后执行
   ```
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
