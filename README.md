@@ -1,5 +1,5 @@
 ## 前端面试题收录
-* 浏览器渲染过程，回流重绘等等，load、DOMContentLoaded等等事件的触发顺序
+* 浏览器渲染过程，回流重绘
   - https://juejin.im/post/5b2e352ef265da59af409832
   - 渲染过程
     1. url 解析: url -> ip(by dns) -> 建立TCP连接 -> 发送http request -> 收到http request
@@ -31,6 +31,34 @@
 
         因为队列中可能会有影响到这些属性或方法返回值的操作，即使你希望获取的信息与队列中操作引发的改变无关，浏览器也会强行清空队列，确保你拿到的值是最精确的。
      ```
+* 浏览器中DOMContentLoaded, load等等事件的触发顺序
+  + https://github.com/fi3ework/BLOG/issues/3
+  + `DOMContentLoaded` —— 浏览器已经完全加载了 HTML，DOM 树已经构建完毕，但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
+  + `load` —— 浏览器已经加载了所有的资源（图像，样式表等), 此时可以获得图片大小
+  + `beforeunload` 在用户即将离开页面时触发，它返回一个字符串，浏览器会向用户展示并询问这个字符串以确定是否离开
+  + `unload` 在用户已经离开时触发，我们在这个阶段仅可以做一些没有延迟的操作，由于种种限制，很少被使用
+  + `defer`会在`DOMContentLoaded`触发之前就执行, 但是`async`不确定, 只是在下载完成之后立刻执行。
+  + 考虑到上述情况, 有时候我们还需要确定页面的状态：
+  ```
+  <script>
+  function log(text) { /* output the time and message */ }
+  log('initial readyState:' + document.readyState);
+
+  document.addEventListener('readystatechange', () => log('readyState:' + document.readyState));
+  document.addEventListener('DOMContentLoaded', () => log('DOMContentLoaded'));
+
+  window.onload = () => log('window onload');
+</script>
+
+<iframe src="iframe.html" onload="log('iframe onload')"></iframe>
+
+<img src="http://en.js.cx/clipart/train.gif" id="img">
+<script>
+  img.onload = () => log('img onload');
+</script>
+* `document.readyState` 在 `DOMContentLoaded` 前一刻变为 `interactive`，这两个事件可以认为是同时发生。
+* `document.readyState` 在所有资源加载完毕后（包括 `iframe` 和 `img`）变成 `complete`，我们可以看到`complete`、 `img.onload` 和 `window.onload` 几乎同时发生，区别就是 `window.onload` 在所有其他的 `load` 事件之后执行
+  ```
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
   渐进增强（Progressive Enhancement）：一开始就针对低版本浏览器进行构建页面，完成基本的功能，然后再针对高级浏览器进行效果、交互、追加功能达到更好的体验。
