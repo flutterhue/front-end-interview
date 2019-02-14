@@ -645,57 +645,43 @@
 * 请解释 `Function.prototype.bind`？
 * 在什么时候你会使用 `document.write()`？
 * 请指出浏览器特性检测，特性推断和浏览器 UA 字符串嗅探的区别？
-* 请尽可能详尽的解释 Ajax 的工作原理。
 * 使用 Ajax 都有哪些优劣？
-* 请解释 JSONP 的工作原理，以及它为什么不是真正的 Ajax。
-* 你使用过 JavaScript 模板系统吗？
-  * 如有使用过，请谈谈你都使用过哪些库？
+  - 优势主要集中在:
+    + 减轻了服务器压力
+    + 无刷新更新网页数据, 优化了用户体验
+  - 劣势
+    + 搜索引擎支持较弱
+    + 不安全, 暴露了服务器更多接口
+    + 不支持浏览器前进,后退功能, 网页状态无法保留 可以通过前端路由进行解决
 * 请解释变量声明提升 (hoisting)。
+
 * 请描述事件冒泡机制 (event bubbling)。
+  + 现代浏览器中先捕获后冒泡, 也就是说标准DOM事件触发以后, 从根节点开始到target节点进行传播, 这个过程叫事件捕获, 然后从target节点传回根节点, 这个过程叫事件冒泡
+ + `addEventListener(event, listener, useCapture)` 第三个参数默认为`false`, 表示不监听事件捕获, 监听事件冒泡. 
+ + 如果此时给一个节点同时添加了两个监听事件, 一个捕获一个冒泡, 那么捕获监听器首先触发, 然后才是冒泡
 * "attribute" 和 "property" 的区别是什么？
-* 为什么扩展 JavaScript 内置对象不是好的做法？
-* 请指出 document load 和 document DOMContentLoaded 两个事件的区别。
-* `==` 和 `===` 有什么不同？
-* 请解释 JavaScript 的同源策略 (same-origin policy)。
-* 如何实现下列代码：
-```javascript
-[1,2,3,4,5].duplicator(); // [1,2,3,4,5,1,2,3,4,5]
-```
-* 什么是三元表达式 (Ternary expression)？“三元 (Ternary)” 表示什么意思？
-* 什么是 `"use strict";` ? 使用它的好处和坏处分别是什么？
-* 请实现一个遍历至 `100` 的 for loop 循环，在能被 `3` 整除时输出 **"fizz"**，在能被 `5` 整除时输出 **"buzz"**，在能同时被 `3` 和 `5` 整除时输出 **"fizzbuzz"**。
+
 * 为何通常会认为保留网站现有的全局作用域 (global scope) 不去改变它，是较好的选择？
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
 * 请解释什么是单页应用 (single page app), 以及如何使其对搜索引擎友好 (SEO-friendly)。
 * 你使用过 Promises 及其 polyfills 吗? 请写出 Promise 的基本用法（ES6）。
 * 使用 Promises 而非回调 (callbacks) 优缺点是什么？
-* 使用一种可以编译成 JavaScript 的语言来写 JavaScript 代码有哪些优缺点？
-* 你使用哪些工具和技术来调试 JavaScript 代码？
+
 * 你会使用怎样的语言结构来遍历对象属性 (object properties) 和数组内容？
 * 请解释可变 (mutable) 和不变 (immutable) 对象的区别。
   * 请举出 JavaScript 中一个不变性对象 (immutable object) 的例子？
   * 不变性 (immutability) 有哪些优缺点？
   * 如何用你自己的代码来实现不变性 (immutability)？
-* 请解释同步 (synchronous) 和异步 (asynchronous) 函数的区别。
-* 什么是事件循环 (event loop)？
-  * 请问调用栈 (call stack) 和任务队列 (task queue) 的区别是什么？
 * 解释 `function foo() {}` 与 `var foo = function() {}` 用法的区别
 
-#### <a name='testing-questions'>测试相关问题：</a>
 
 * 对代码进行测试的有什么优缺点？
 * 你会用什么工具测试你的代码功能？
 * 单元测试与功能/集成测试的区别是什么？
 * 代码风格 linting 工具的作用是什么？
-
-#### <a name='performance-questions'>效能相关问题：</a>
-
 * 你会用什么工具来查找代码中的性能问题？
 * 你会用什么方式来增强网站的页面滚动效能？
 * 请解释 layout、painting 和 compositing 的区别。
-
-#### <a name='network-questions'>网络相关问题：</a>
-
 * 为什么传统上利用多个域名来提供网站资源会更有效？
 * 请尽可能完整得描述从输入 URL 到整个网页加载完毕及显示在屏幕上的整个流程。
 * Long-Polling、Websockets 和 Server-Sent Event 之间有什么区别？
