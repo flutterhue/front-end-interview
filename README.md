@@ -388,6 +388,7 @@
 * 聊一聊JS中的`event loop`
   - 首先要明确JavaScript本身是单线程的, 但它却是异步的, JavaScript实现异步的机制就是`event loop`
   ```
+      ref: https://juejin.im/post/5c148ec8e51d4576e83fd836
 	1.「宏任务」、「微任务」都是队列，一段代码执行时，会先执行宏任务中的同步代码。
       + 宏任务包括`整体代码script`, `setTimeout`, `setInterval`
       + 微任务包括`Promise`, `process.nextTick`(这个好像只有Node中有)
