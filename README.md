@@ -491,9 +491,66 @@
         //    3. `age`已经存在且`age`属性存在`set`方法, 则具体行为依`set`而定
         
     ```
+* 使用es5实现es6的class
+  ```
+    // 工具函数 
+    // 代替es6中的Object.create
+    // 返回一个空对象其原型为传入的prototype
+    function createPolyfill (prototype) {
+      function F () {}
+      F.prototype = prototype
+      return new F()
+    }
+
+    // 1.1 父类构造函数的定义
+    function Animal (age) {
+      if (!this instanceof Animal) throw Error('Add new !')
+      this.age = age
+    }
+
+    // 1.2 父类方法的定义
+    Animal.prototype.logAge = function () {
+      console.log(this.age)
+    }
+
+    // 2.1 子类构造函数的定义
+    function Cat (name, age) {
+
+      if (!this instanceof Cat) throw Error('Add new !')
+      Animal.call(this, age)
+      this.name = name
+    }
+
+    // 2.2 继承声明 (必须在子类方法定义前)
+    Cat.prototype = createPolyfill(Animal.prototype)
+    Cat.prototype.constructor = Cat
+
+    // 2.3 子类方法的定义
+    Cat.prototype.logName = function () {
+      console.log(this.name)
+    }
+    
+    // 以上代码等效于以下ES6代码, 可自行验证
+    class Animal {
+       constructor (age) {
+         this.age = age 
+       }
+
+       logAge () { console.log(this.age) 
+    }
+    
+    class Cat extends Animal {
+       constructor (name, age) {
+         super(age)
+         this.name = name 
+       }
+
+       logName () { console.log(this.name) }
+    }
+  ```
 * JavaScript 内部属性
-    - 由JavaScript引擎内部使用的属性,不能通过JavaScript代码直接访问到
-    - 例如 `[[Prototype]]`能用`Object.getPrototypeOf()`和`Object.setPrototypeOf()`来读取和修改
+  - 由JavaScript引擎内部使用的属性,不能通过JavaScript代码直接访问到
+  - 例如 `[[Prototype]]`能用`Object.getPrototypeOf()`和`Object.setPrototypeOf()`来读取和修改
 * 手写函数防抖和函数节流
 	```js
 		// 防抖和节流多用于页面滚动事件等短时间内触发频率较高的事件, 关键是限制函数调用次数来提高性能
