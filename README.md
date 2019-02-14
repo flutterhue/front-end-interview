@@ -383,6 +383,35 @@
 * 为什么响应式设计 (responsive design) 和自适应设计 (adaptive design) 不同？
 * 你有兼容 retina 屏幕的经历吗？如果有，在什么地方使用了何种技术？
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
+* 讲express框架的设计思想
+  - TODO
+* 聊一聊JS中的`event loop`
+  - 首先要明确JavaScript本身是单线程的, 但它却是异步的, JavaScript实现异步的机制就是`event loop`
+  ```
+	1.「宏任务」、「微任务」都是队列，一段代码执行时，会先执行宏任务中的同步代码。
+      + 宏任务包括`整体代码script`, `setTimeout`, `setInterval`
+      + 微任务包括`Promise`, `process.nextTick`(这个好像只有Node中有)
+	2. 进行第一轮事件循环的时候会把全部的js脚本当成一个宏任务来运行。
+	3. 如果执行中遇到setTimeout之类宏任务，那么就把这个setTimeout内部的函数推入「宏任务的队列」中，下一轮宏任务执行时调用。
+	4. 如果执行中遇到 promise.then() 之类的微任务，就会推入到「当前宏任务的微任务队列」中，在本轮宏任务的同步代码都执行完成后，依次执行所有的微任务。
+	5. 第一轮事件循环中当执行完全部的同步脚本以及微任务队列中的事件，这一轮事件循环就结束了，开始第二轮事件循环。
+	6. 第二轮事件循环同理先执行同步脚本，遇到其他宏任务代码块继续追加到「宏任务的队列」中，遇到微任务，就会推入到「当前宏任务的微任务队列」中，在本轮宏任务的同步代码执行都完成后，依次执行当前所有的微任务。
+	开始第三轮，循环往复...
+    
+    可验证
+    
+    setTimeout(() => console.log('timeout'), 0);
+    Promise.resolve(true).then(() => {console.log('promise')})
+    console.log('directly log')
+
+    // Chrome 72
+    // console output
+    VM745:3 directly log
+    VM745:2 promise
+    undefined
+    VM745:1 timeout
+  ```
+  
 * JavaScript中对象的属性定义与赋值的区别
     - http://www.cnblogs.com/ziyunfei/archive/2012/10/31/2738728.html
     ```js
