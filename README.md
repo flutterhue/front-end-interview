@@ -424,8 +424,8 @@
   ```
       ref: https://juejin.im/post/5c148ec8e51d4576e83fd836
 	1.「宏任务」、「微任务」都是队列，一段代码执行时，会先执行宏任务中的同步代码。
-      + 宏任务包括`整体代码script`, `setTimeout`, `setInterval`
-      + 微任务包括`Promise`, `process.nextTick`(这个好像只有Node中有)
+      + 宏任务包括`整体代码script`, `setTimeout`, `setInterval`, IO, UI渲染
+      + 微任务包括`Promise`, Object.observe、MutationObserver
 	2. 进行第一轮事件循环的时候会把全部的js脚本当成一个宏任务来运行。
 	3. 如果执行中遇到setTimeout之类宏任务，那么就把这个setTimeout内部的函数推入「宏任务的队列」中，下一轮宏任务执行时调用。
 	4. 如果执行中遇到 promise.then() 之类的微任务，就会推入到「当前宏任务的微任务队列」中，在本轮宏任务的同步代码都执行完成后，依次执行所有的微任务。
@@ -446,7 +446,27 @@
     undefined
     VM745:1 timeout
   ```
+* 浏览器的事件循环和nodejs事件循环的区别
+  ```
+  ref: https://segmentfault.com/a/1190000013660033
+  以上聊的实际上是浏览器中的事件循环, nodejs时间循环主要由libuv实现
+  其中 Macrotask 主要分化为一下六步骤
+    1. timers：执行满足条件的setTimeout、setInterval回调。
+    2. I/O callbacks：是否有已完成的I/O操作的回调函数，来自上一轮的poll残留。
+    3. idle，prepare：可忽略
+    4. poll：等待还没完成的I/O事件，会因timers和超时时间等结束等待。
+    5. check：执行setImmediate的回调。
+    6. close callbacks：关闭所有的closing handles，一些onclose事件。
+  此外还有 MicroTask 和 process.nextTick, 对应 MicroTask Queue 和 NextTick Queue, 和上面合并之后最终过程为:
   
+    清空当前循环内的Timers Queue，清空NextTick Queue，清空Microtask Queue。
+    清空当前循环内的I/O Queue，清空NextTick Queue，清空Microtask Queue。
+    清空当前循环内的Check Queu，清空NextTick Queue，清空Microtask Queue。
+    清空当前循环内的Close Queu，清空NextTick Queue，清空Microtask Queue。
+    进入下轮循环。
+    
+    可以看出，nextTick优先级比promise等microtask高。setTimeout和setInterval优先级比setImmediate高。 这些在浏览器中都不存在
+  ```
 * JavaScript中对象的属性定义与赋值的区别
     - http://www.cnblogs.com/ziyunfei/archive/2012/10/31/2738728.html
     ```js
@@ -602,10 +622,18 @@
 * 请解释原型继承 (prototypal inheritance) 的原理。
   - 每个对象都有原型, 对象访问属性时, 若未找到, 会沿着原型链一直往上找
   - 根据这个原理, 我们可以让被继承对象成为继承对象的原型即可实现继承的效果
-* 你怎么看 AMD vs. CommonJS？
-  - 
+* 你怎么看 AMD vs. vs. CMD vs. CommonJS？
+  - 都是JavaScript模块化的解决方案
+  - CommonJS主要是Node在遵循的规范, 作用于后端
+  - CommonJS在前端不适用的主要原因是前端模块需要从网络上下载, 必须采用异步的方式引入.
+  - 其他两个是前端依赖解决方案, AMD是依赖前置, CMD是依赖就近. 
+  - CMD好像是国人玉伯开发的
 * 请解释为什么接下来这段代码不是 IIFE (立即调用的函数表达式)：`function foo(){ }();`.
-  * 要做哪些改动使它变成 IIFE?
+  ```
+    function foo(){ }();  // 前半部分被解释器解析为一个函数, 后半部分是括号, 直接报错. 解决方案:
+    1. (function foo(){ })()
+    2. (function foo(){ }())
+  ```
 * 描述以下变量的区别：`null`，`undefined` 或 `undeclared`？
   * 该如何检测它们？
 * 什么是闭包 (closure)，如何使用它，为什么要使用它？
