@@ -385,6 +385,40 @@
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
 * 讲express框架的设计思想
   - TODO
+* 讲express的中间件系统是如何设计的
+  - TODO
+* 讲nodejs的eventEmitter的实现
+  ```js
+	  class EventEmitter {
+	  constructor () {
+	    this.eventListenersMap = {}
+	    this.on = this.addListener
+	    this.off = this.removeListener
+	  }
+
+	  addListener = (event, listener) => {
+	    if (this.eventListenersMap[event]) {
+		  this.eventListenersMap[event].push(listener)
+	    } else {
+	      this.eventListenersMap[event] = [listener]
+	    }
+	   return listener
+	  }
+
+	  removeListener = (event, listener) => {
+	    this.eventListenersMap[event] && 
+		(this.eventListenersMap[event] = 
+		this.eventListenersMap[event].filter(each => each != listener))
+	  }
+
+	 emit = (event, ...args) => {
+	   this.eventListenersMap[event] && 
+	   this.eventListenersMap[event].forEach(
+	     listener => listener.apply(event, args)
+	   )
+	 }
+	}
+  ```
 * 聊一聊JS中的`event loop`
   - 首先要明确JavaScript本身是单线程的, 但它却是异步的, JavaScript实现异步的机制就是`event loop`
   ```
