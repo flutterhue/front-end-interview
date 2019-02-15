@@ -94,8 +94,8 @@
   + 详见 https://www.zhihu.com/question/20474326
   
 * 为什么传统上利用多个域名来提供网站资源会更有效？
-- CDN
-- 浏览器对单域名的并行数量有限
+ - CDN
+ - 浏览器对单域名的并行数量有限
 
 
 * 什么是viewport, 有什么作用??
@@ -328,22 +328,28 @@
 * 请解释 CSS sprites，以及你要如何在页面或网站中实现它。
   - 为了节省http请求数量, 提高网页性能, 将多张素材图片合并到一张大图中
   - 可维护差, 每次改动都需要图片
+  
+  
 * 你用过栅格系统 (grid system) 吗？如果使用过，你最喜欢哪种？
   - css3 grid https://www.zhangxinxu.com/wordpress/2018/11/display-grid-css-css3/
   - 自制 grid https://www.zcfy.cc/article/how-to-build-a-responsive-grid-system-zell-liew
-* 请写一个简单的幻灯效果页面。
-  - TODO 
+
+
 * 什么是`rem`和`em`有什么区别
   - https://yanhaijing.com/css/2017/09/29/principle-of-rem-layout/
   - em作为font-size的单位时，其代表父元素的字体大小，em作为其他属性单位时，代表自身字体大小
   - rem作用于非根元素时，相对于根元素字体大小；rem作用于根元素字体大小时，相对于其出初始字体大小
   - rem可以用来做弹性布局, 通过设置根元素的字体大小来作为其他元素大小的单位.
   - 但更好的方案是 vw —— 视口宽度的 1/100；vh —— 视口高度的 1/10
+  
+  
 * 水平居中的方式
   - 对于行内元素, 可以使用为其容器添加 `text-align: center`
   - 对于有宽度的块级元素, 可以为其自身添加 `margin: 0 auto`
   - 为其自身添加 `position: relative; left: 50%; transform: translate(-50%, 0)` 也可以
   - 为其容器添加 `display: flex; justify-content: center;` 也可以
+  
+  
 * 垂直居中的方式
   ```css
   	/* 对于单行文本 */
@@ -374,13 +380,19 @@
 		transform: translate(0, -50%);
 	}
   ```
+  
+  
 * 有哪些行内替换元素, 他们有什么特点, 和行内元素有什么区别
   - 例如`img`, `input`根据标签的属性显示内容, 可以设置四个方向上的`padding, margin`以及`width, height`
   - 行内元素例如`span`, `a`竖直方向上的`padding-top、padding-bottom、margin-top、margin-bottom`无效果, 水平方向有效果
   - 实际上行内元素的`padding-top、padding-bottom`从视觉上确实是撑开了(例如添加背景), 但实际上并不对周围元素产生影响
+  
+  
 * `vertical-align`有什么作用
   - http://www.cnblogs.com/hykun/p/3937852.html
   - https://zhuanlan.zhihu.com/p/28626505
+  
+  
 * 你用过媒体查询，或针对移动端的布局/CSS 吗？
   ```js
       if (window.matchMedia("(min-width: 400px)").matches) {
@@ -396,6 +408,8 @@
           }
       }
   ```
+  
+  
 * 如何优化网页的打印样式？
   - https://blog.csdn.net/xujie_0311/article/details/42271273
   ```css
@@ -408,14 +422,80 @@
 		}
 	  </style>
   ```
+  
+  
 * 在书写高效 CSS 时会有哪些问题需要考虑？
+  - 选择器越通用效率越低, 四种选择器的解析速度由快到慢依次是：ID、class、tag和universal(*)
+  - 避免过度约束, 例如ul#main-navigation { } ID已经是唯一的，不需要Tag来标识，这样做会让选择器变慢
+  - 避免后代选择符, 下面这个选择器是很低效的： html body ul li a { }
+  - 使用紧凑的语法, 避免不必要的重复
+  
 
 * 请解释浏览器是如何判断元素是否匹配某个 CSS 选择器？
+    ```
+    CSS选择器的解析是从右向左解析的。若从左向右的匹配，发现不符合规则，需要进行回溯，会损失很多性能。若从右向左匹配，先找到所有的最右节点，对于每一个节点，向上寻找其父节点直到找到根元素或满足条件的匹配规则，则结束这个分支的遍历。两种匹配规则的性能差别很大，是因为从右向左的匹配在第一步就筛选掉了大量的不符合条件的最右节点（叶子节点），而从左向右的匹配规则的性能都浪费在了失败的查找上
+    ```
+    
+    
 * 请描述伪元素 (pseudo-elements) 及其用途。
+  - 单冒号是伪类 例如`:hover, :visited, :checked`, 表示的是元素的状态或者结构特点, 例如鼠标在其上, 浏览过, 选择了, 第3个div等等
+  - 双冒号是微元素 例如`::before, ::after`, 表示的是一种虚拟的元素，CSS把它当成普通HTML元素, 之所以叫伪元素，就因为它们在文档树或DOM中并不实际存在
+  - 伪元素可用来制作图标, 消除浮动等
+  
+  
 * 请解释你对盒模型的理解，以及如何在 CSS 中告诉浏览器使用不同的盒模型来渲染你的布局。
-* 请解释 ```* { box-sizing: border-box; }``` 的作用, 并且说明使用它有什么好处？
+  - 浏览器默认盒模型是 content-box 也就是说 盒宽 = 左右margin + 左右border + 左右padding + width (宽度即内容宽度) 同理高
+  - 设置```* { box-sizing: border-box; }```之后 盒宽 = 左右margin + width (width = 左右border + 左右padding + 内容宽)
+  
+  
 * 请罗列出你所知道的 display 属性的全部值
+  - block 
+  ```
+    block元素会独占一行，多个block元素会各自新起一行。默认情况下，block元素宽度自动填满其父元素宽度。
+    block元素可以设置width,height属性。块级元素即使设置了宽度,仍然是独占一行。
+    block元素可以设置margin和padding属性。
+  ```
+  - inline
+  ```
+    inline元素不会独占一行，多个相邻的行内元素会排列在同一行里，直到一行排列不下，才会新换一行，其宽度随元素的内容而变化。
+    inline元素设置width,height属性无效。
+    inline元素的margin和padding属性，水平方向的padding-left, padding-right, margin-left, margin-right都产生边距效果；但竖直方向的padding-top, padding-bottom, margin-top, margin-bottom不会产生边距效果, 但背景有效果. 也就是说竖直方向上位置不影响其他元素, 但是视觉效果上会影响, 例如
+    https://jsbin.com/kitoxigaca/1/edit?html,css,output
+  ```
+  - inline-block
+  ```
+    就是将对象呈现为inline对象，多个inline对象会被排列在同一行内. 但同时我们可以想设置block一样设置其宽高, margin, padding，且像block一样会影响其他元素
+    https://jsbin.com/kazezujofe/edit?html,css,output
+  ```
+  - flex
+  ```
+  几个常用的
+  1. 给容器添加的
+    display: flex
+    flex-direction: column, row （默认row） 也就是主轴方向
+    justify-content: center 主轴居中
+    align-items: center 副轴
+    
+  2. 给孩子的
+    flex: flex-grow, flex-shrink 和 flex-basis
+    flex-grow: 0 不放大, 其他数字的话根据其他孩子的该值按比例放大
+    flex-shrink: 0 不缩小, 其他数字的话根据其他孩子的该值按比例缩小
+    flex-basis: 占主轴的宽度, 或者auto表示占宽度按照节点本来大小算
+    flex: auto (1 1 auto) | none (0 0 auto)
+  ```
+  - grid
+  ```
+  
+  ```
+  - none
+  ```
+    不显示, 也不占空间
+  ```
+  - 忽略 table
+  
 * 请解释 inline 和 inline-block 的区别？
+  -
+
 * 如何去除inline-block元素间的间隙
   - 产生间隙的原因是标签间的空格
   - 去除相邻的标签之间的空格
@@ -430,17 +510,36 @@
   ```
   - 设置`font-size`或者`letter-spacing`或者`word-spacing`
   - 使用margin负值
+
+
 * 请解释 relative、fixed、absolute 和 static 元素的区别
+  - 默认是static
+  - relative 是相对于static位置调整 left, right, top, bottom 但不影响其他元素布局
+  - absolute 相对非static的父类或祖先位置进行调整, 而且已经脱离标准文档流
+  - fixed 是相对浏览器, 而且已经脱离标准文档流
+
+
 * CSS 中字母 'C' 的意思是叠层 (Cascading)。请问在确定样式的过程中优先级是如何决定的 (请举例)？如何有效使用此系统？
-* 你在开发或生产环境中使用过哪些 CSS 框架？你觉得应该如何改善他们？
-* 请问你有尝试过 CSS Flexbox 或者 Grid 标准规格吗？
+  - 首先把所有样式分成三类, `!important`, 行内(即标签内部的), 内联(style标签中)和外联(另外的css文件中)
+  - 在每一类中, 从0开始，id选择器+100，一个属性选择器、class或者伪类+10，一个元素选择器，或者伪元素+1，通配符+0
+  - 优先取权重高的, 权重相同, 取后定义的, 这就是层叠的来源.
+  
+  
 * 为什么响应式设计 (responsive design) 和自适应设计 (adaptive design) 不同？
-* 你有兼容 retina 屏幕的经历吗？如果有，在什么地方使用了何种技术？
+  - 前者是一个网页, 根据设备改变而发生布局的变化, 本质上这种检测是客户端的css以及js来完成的
+  - 检测不同的设备, 并分别对应不同的网页, 这种检测是服务器端根据请求的不同而返回对应不同的网页来实现的.
+  
+  
 * 请问为何要使用 `translate()` 而非 *absolute positioning*，或反之的理由？为什么？
+  - 使用 transform 时，可以让 GPU 参与运算，动画的 FPS 更高。
+  - translate不会引起浏览器的重绘和重排
+  - 使用 position 时，最小的动画变化的单位是 1px，而使用 transform 参与时，可以做到更小（动画效果更加平滑）
+  
 * 讲express框架的设计思想
   - TODO
 * 讲express的中间件系统是如何设计的
   - TODO
+  
 * 讲nodejs的eventEmitter的实现
   ```js
 	  class EventEmitter {
@@ -473,6 +572,8 @@
 	 }
 	}
   ```
+  
+  
 * 聊一聊JS中的`event loop`
   - 首先要明确JavaScript本身是单线程的, 但它却是异步的, JavaScript实现异步的机制就是`event loop`
   ```
@@ -500,6 +601,8 @@
     undefined
     VM745:1 timeout
   ```
+  
+  
 * 浏览器的事件循环和nodejs事件循环的区别
   ```
   ref: https://segmentfault.com/a/1190000013660033
@@ -521,6 +624,8 @@
     
     可以看出，nextTick优先级比promise等microtask高。setTimeout和setInterval优先级比setImmediate高。 这些在浏览器中都不存在
   ```
+  
+  
 * JavaScript中对象的属性定义与赋值的区别
     - http://www.cnblogs.com/ziyunfei/archive/2012/10/31/2738728.html
     ```js
@@ -565,6 +670,8 @@
         //    3. `age`已经存在且`age`属性存在`set`方法, 则具体行为依`set`而定
         
     ```
+    
+    
 * 使用es5实现es6的class
   ```
     // 工具函数 
@@ -622,9 +729,13 @@
        logName () { console.log(this.name) }
     }
   ```
+  
+  
 * JavaScript 内部属性
   - 由JavaScript引擎内部使用的属性,不能通过JavaScript代码直接访问到
   - 例如 `[[Prototype]]`能用`Object.getPrototypeOf()`和`Object.setPrototypeOf()`来读取和修改
+  
+  
 * 手写函数防抖和函数节流
 	```js
 		// 防抖和节流多用于页面滚动事件等短时间内触发频率较高的事件, 关键是限制函数调用次数来提高性能
@@ -662,32 +773,46 @@
         // window.onscroll = debounce (e => { console.log(1) }, 1000)
         // window.onscroll = throttle (e => { console.log(1) }, 1000)
 	```
+    
+    
 * 请解释事件代理 (event delegation)。
   - 事件委托是将事件监听器添加到父元素，而不是每个子元素单独设置事件监听器。当触发子元素时，事件会冒泡到父元素，监听器就会触发
   - 这样一来只需要为父元素编写事件处理函数, 有利于统一管理, 同时同类元素无需分别添加事件处理
+  
+  
 * JavaScript的sort方法内部使用的什么排序？
   - Chrome 查过10用快排否则用插入排序， Firefox 是归并
+  
+  
 * 请解释 JavaScript 中 `this` 是如何工作的。
   - new Person(), Person函数内部this 指向新对象
   - apply, call, bind强行绑定
   - fuck.something(), somthing函数内部this指向fuck
   - 不符合上述, this指向全局, 若为strict模式, 则指向undefined
   - 箭头函数中this永远指向创建该函数时上下文中的this, 且无法修改
+  
+  
 * 请解释原型继承 (prototypal inheritance) 的原理。
   - 每个对象都有原型, 对象访问属性时, 若未找到, 会沿着原型链一直往上找
   - 根据这个原理, 我们可以让被继承对象成为继承对象的原型即可实现继承的效果
+  
+  
 * 你怎么看 AMD vs. vs. CMD vs. CommonJS？
   - 都是JavaScript模块化的解决方案
   - CommonJS主要是Node在遵循的规范, 作用于后端
   - CommonJS在前端不适用的主要原因是前端模块需要从网络上下载, 必须采用异步的方式引入.
   - 其他两个是前端依赖解决方案, AMD是依赖前置, CMD是依赖就近. 
   - CMD好像是国人玉伯开发的
+  
+  
 * 请解释为什么接下来这段代码不是 IIFE (立即调用的函数表达式)：`function foo(){ }();`.
   ```
     function foo(){ }();  // 前半部分被解释器解析为一个函数, 后半部分是括号, 直接报错. 解决方案:
     1. (function foo(){ })()
     2. (function foo(){ }())
   ```
+  
+  
 * 描述以下变量的区别：`null`，`undefined` 或 `undeclared`？
   - `null` 表示空对象, 但是使用`typeof null` 会返回 "object", 判断null直接用 === 即可
   - `undefined` 表示 var, let, const 声明了但没有赋值的变量, 连同 `undeclared` 变量一起, typeof 都会返回 'undefined'
@@ -701,6 +826,8 @@
 	console.log('未定义')
   }
   ```
+  
+  
 * 什么是闭包 (closure)，如何使用它，为什么要使用它？
   - 函数内部定义的函数作为外部函数的返回值返回后, 借助返回的内部函数仍能访问到外部函数内的变量
   - 构造私有变量
@@ -721,23 +848,29 @@
     return { }
   }())
   ```
+  
+  
 * 请指出 JavaScript 宿主对象 (host objects) 和原生对象 (native objects) 的区别？
   - 宿主对象是由运行时环境（浏览器或 Node）提供，比如window、XMLHTTPRequest等等
   - 原生对象是由 ECMAScript 规范定义的 JavaScript 内置对象，比如String、Math、RegExp、Object、Function等等。
+  
   
 * 请指出以下代码的区别：`function Person(){}`、`var person = Person()`、`var person = new Person()`？
   - `function Person() {}` 是函数定义
   - `var person = Person()` 是普通的函数调用
   - `var person = new Person()` 是使用`new`操作符构建Person对象的实例
   
+  
 * `.call` 和 `.apply` 的区别是什么？
   - 两者第一个参数都是指定上下文this, `call`剩下的参数数量不定, 会被原样传入调用函数, 而`apply`剩下的参数是一个数组, 会将该数组中的每个变量作为参数传入调用函数.
   - 据说某些JS引擎上 `call` 的性能更好
   - https://www.zhihu.com/question/61088667
   
+  
 * 请说明.forEach循环和.map()循环的主要区别，它们分别在什么情况下使用
   - `forEach`主要用于依靠循环中的每一个值来进行一些操作, 本身不改变原数组也不返回新数组
   - `map`是通过传入函数来声明旧数组和新数组的关系, 通过这种方式来构建并返回新数组
+  
   
 * 请解释 `Function.prototype.bind`？
   ```
@@ -756,8 +889,10 @@
   // Window 1 2 3
   ```
   
+  
 * 在什么时候你会使用 `document.write()`？
   - ??? 直接运行 会导致页面中 body 下内容被清空并改写为传入字符
+  
   
 * 请指出浏览器特性检测，特性推断和浏览器 UA 字符串嗅探的区别？
   - 功能检测包括确定浏览器是否支持某段代码，以及是否运行不同的代码（取决于它是否执行），以便浏览器始终能够正常运行代码功能，而不会在某些浏览器中出现崩溃和错误。例如
@@ -772,6 +907,7 @@
   - UA字符串：这是一个浏览器报告的字符串，它允许网络协议对等方（network protocol peers）识别请求用户代理的应用类型、操作系统、应用供应商和应用版本。它可以通过navigator.userAgent访问。 然而，这个字符串很难解析并且很可能存在欺骗性。例如，Chrome 会同时作为 Chrome 和 Safari 进行报告。因此，要检测 Safari，除了检查 Safari 字符串，还要检查是否存在 Chrome 字符串。不要使用这种方式。
   - 个人感觉UA字符串和UA头一样, 都是不靠谱的, 例如爬虫中可以随意设置UA头. 只不过UA字符串即navigator.userAgent是客户端浏览器自己识别客户机器的结果, 而UA头主要放在HTTP请求中.
   
+  
 * 使用 Ajax 都有哪些优劣？
   - 优势主要集中在:
     + 减轻了服务器压力
@@ -780,6 +916,7 @@
     + 搜索引擎支持较弱
     + 不安全, 暴露了服务器更多接口
     + 不支持浏览器前进,后退功能, 网页状态无法保留 可以通过前端路由进行解决
+    
     
 * 请解释变量声明提升 (hoisting)。
    ```js
@@ -811,10 +948,12 @@
    // 这种方式下类似是变量声明提升, 所以报错
    ```
    
+   
 * 请描述事件冒泡机制 (event bubbling)。
   + 现代浏览器中先捕获后冒泡, 也就是说标准DOM事件触发以后, 从根节点开始到target节点进行传播, 这个过程叫事件捕获, 然后从target节点传回根节点, 这个过程叫事件冒泡
   + `addEventListener(event, listener, useCapture)` 第三个参数默认为`false`, 表示不监听事件捕获, 监听事件冒泡. 
   + 如果此时给一个节点同时添加了两个监听事件, 一个捕获一个冒泡, 那么捕获监听器首先触发, 然后才是冒泡
+  
   
 * "attribute" 和 "property" 的区别是什么？
  - attribute是HTML标签上的特性，它的值只能够是字符串, node.attributes是一个类数组对象, property是DOM中的属性，是JavaScript里的对象
@@ -829,13 +968,16 @@
  ```
  - https://www.cnblogs.com/elcarim5efil/p/4698980.html
  
+ 
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
   - load 触发比较慢, 需要等DOM以及相关资源全部加载完成之后才触发
   - 而 DOMContentLoaded 的触发无需等待样式表, 图片等多媒体资源以及iframe等子框架的加载
-  
+ 
+ 
 * 请解释什么是单页应用 (single page app), 以及如何使其对搜索引擎友好 (SEO-friendly)。
   - 开局一个HTML, 更新全靠AJAX
   - SEO的话需要SSR或者其他预渲染工具
+
 
 * 使用 Promises 而非回调 (callbacks) 优缺点是什么？
   - 条例清晰, 类似线性代码执行顺序, 防止回调地狱
@@ -854,6 +996,7 @@
   ```
   - callback可能调用太晚, 可以用`race`确保回调发生及时
   - 确保只发生一次, 因为到了 Resolved 状态就不再改变了
+
 
 * 你会使用怎样的语言结构来遍历对象属性 (object properties) 和数组内容？
   - 对象
@@ -898,12 +1041,14 @@
   
   for (let i = 0; i < list.length; ++i) {} // 
   ```
-  
+
+
 * 请解释可变 (mutable) 和不变 (immutable) 对象的区别。
   - 可变对象 在创建之后是可以被改变的, 
   - 不可变的例如 string 和 number 从设计之初就是不可变(Immutable)
   - 不可变那其实是保持一个对象状态不变，这样做的好处是使得开发更加简单，可回溯，测试友好，减少了任何可能的副作用。但是，每当你想添加点东西到一个不可变(Immutable)对象里时，它一定是先拷贝已存在的值到新实例里，然后再给新实例添加内容，最后返回新实例。相比可变对象，这势必会有更多内存、计算量消耗
   - 尽量写纯函数, 使用const, 或利用 `Object.freeze()`, `Object.seal()`
+
 
 * 你会用什么工具测试你的代码功能？
   - 只用过jest
@@ -928,8 +1073,19 @@
   * Transfer-Encoding
   * ETag
   * X-Frame-Options
+  
+  
 * 什么是 HTTP method？请罗列出你所知道的所有 HTTP method，并给出解释。
+  - get
+  - post
+  - put
+  - delete
+  - 
+  
+  
 * 请解释 HTTP status 301 与 302 的区别？
+  - 301 表示资源永久转移, 浏览器以后都用返回头中的新地址即可
+  - 302 表示暂时转移（也许只是短暂的维护所以使用了一个临时的链接）, 浏览器以后还是用老地址
 
 
 *问题：`foo`的值是什么？*
