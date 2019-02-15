@@ -635,13 +635,26 @@
     2. (function foo(){ }())
   ```
 * 描述以下变量的区别：`null`，`undefined` 或 `undeclared`？
-  * 该如何检测它们？
+  - `null` 表示空对象, 但是使用`typeof null` 会返回 "object", 判断null直接用 === 即可
+  - `undefined` 表示 var, let, const 声明了但没有赋值的变量, 连同 `undeclared` 变量一起, typeof 都会返回 'undefined'
+  - 由于`undeclared`的变量直接引用会报错, 所以不能直接判断
+  ```
+  // 以下方式可区分后两者
+  try{
+	a // 要检测的变量名
+	console.log('已定义')
+  } catch (e){
+	console.log('未定义')
+  }
+  ```
 * 什么是闭包 (closure)，如何使用它，为什么要使用它？
 * 请举出一个匿名函数的典型用例？
-* 你是如何组织自己的代码？是使用模块模式，还是使用经典继承的方法？
 * 请指出 JavaScript 宿主对象 (host objects) 和原生对象 (native objects) 的区别？
 * 请指出以下代码的区别：`function Person(){}`、`var person = Person()`、`var person = new Person()`？
 * `.call` 和 `.apply` 的区别是什么？
+  - 两者第一个参数都是指定上下文this, `call`剩下的参数数量不定, 会被原样传入调用函数, 而`apply`剩下的参数是一个数组, 会将该数组中的每个变量作为参数传入调用函数.
+  - 据说某些JS引擎上 `call` 的性能更好
+  - https://www.zhihu.com/question/61088667
 * 请解释 `Function.prototype.bind`？
 * 在什么时候你会使用 `document.write()`？
 * 请指出浏览器特性检测，特性推断和浏览器 UA 字符串嗅探的区别？
@@ -654,7 +667,34 @@
     + 不安全, 暴露了服务器更多接口
     + 不支持浏览器前进,后退功能, 网页状态无法保留 可以通过前端路由进行解决
 * 请解释变量声明提升 (hoisting)。
-
+   ```js
+   // 1. 变量声明提升, 注意是声明提升
+   console.log(x)
+   var x = 3
+   console.log(x)
+   // undefined
+   // 3
+   原因是因为只提升了var声明, 也就是说, 以上代码等效于
+   var x
+   console.log(x)
+   x = 3
+   console.log(x)
+   
+   // 2. 函数提升
+   // 写函数有两种方式, 其提升规则存在区别
+   
+   // 方式1
+   go()
+   function go () { console.log('go') }
+   // go
+   // 这种方式下, 整个函数连带定义都被提升
+   
+   // 方式2
+   go()
+   var go = function () { console.log('go') }
+   // Uncaught TypeError: go is not a function
+   // 这种方式下类似是变量声明提升, 所以报错
+   ```
 * 请描述事件冒泡机制 (event bubbling)。
   + 现代浏览器中先捕获后冒泡, 也就是说标准DOM事件触发以后, 从根节点开始到target节点进行传播, 这个过程叫事件捕获, 然后从target节点传回根节点, 这个过程叫事件冒泡
   + `addEventListener(event, listener, useCapture)` 第三个参数默认为`false`, 表示不监听事件捕获, 监听事件冒泡. 
