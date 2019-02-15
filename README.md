@@ -31,6 +31,8 @@
 
         因为队列中可能会有影响到这些属性或方法返回值的操作，即使你希望获取的信息与队列中操作引发的改变无关，浏览器也会强行清空队列，确保你拿到的值是最精确的。
      ```
+     
+     
 * 浏览器中DOMContentLoaded, load等等事件的触发顺序
   + https://github.com/fi3ework/BLOG/issues/3
   + `DOMContentLoaded` —— 浏览器已经完全加载了 HTML，DOM 树已经构建完毕，但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
@@ -67,23 +69,35 @@
   `document.readyState` 在 `DOMContentLoaded` 前一刻变为 `interactive`，这两个事件可以认为是同时发生。
   `document.readyState` 在所有资源加载完毕后（包括 `iframe` 和 `img`）变成 `complete`，我们可以看到`complete`、 `img.onload` 和         `window.onload` 几乎同时发生，区别就是 `window.onload` 在所有其他的 `load` 事件之后执行
   ```
+  
+  
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
   渐进增强（Progressive Enhancement）：一开始就针对低版本浏览器进行构建页面，完成基本的功能，然后再针对高级浏览器进行效果、交互、追加功能达到更好的体验。
 
   优雅降级（Graceful Degradation）：一开始就构建站点的完整功能，然后针对浏览器测试和修复。比如一开始使用 CSS3 的特性构建了一个应用，然后逐步针对各大浏览器进行 hack 使其可以在低版本浏览器上正常浏览。
   ```
+  
+  
 * 你如何对网站的文件和资源进行优化？/ 请说出三种减少页面加载时间的方法。(加载时间指感知的时间或者实际加载时间)
   + CDN (Content Distribution Network)
   + 尽可能减少http请求次数，将css, js, 图片各自合并 
   + 添加Expire/Cache-Control头
   + 启用Gzip压缩文件
   + 最小化css, js，减小文件体积
+  
+  
 * 浏览器同一时间可以从一个域名下载多少资源？
   + 即使最新的也在8以内, 目的主要是安全以及性能因素
   + 并发过多请求容易超出服务器阈值而被BAN.
   + 有利于浏览器复用现有连接 (keep alive技术)
   + 详见 https://www.zhihu.com/question/20474326
+  
+* 为什么传统上利用多个域名来提供网站资源会更有效？
+- CDN
+- 浏览器对单域名的并行数量有限
+
+
 * 什么是viewport, 有什么作用??
   + https://www.cnblogs.com/2050/p/3877280.html
   + 首先设备中的1px和css中的1px不一定相等, 前者是物理像素后者是独立像素, 在现代高分屏幕(1080x1920)上通常一个独立像素由多个物理像素表示
@@ -92,6 +106,8 @@
   + `visual viewport` 是浏览器的可视宽度, 在移动设备上通常小于`layout viewport`, 这也是为什么有些页面会在手机上出现横向滚动条
   + `ideal viewport`是移动端理想的viewport, 例如iphoneX该值为`350px`, 它的宽度约等于屏幕的实际宽度
   + 使用以下标签`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">` 可以使得`layout viewport`的大小等于`ideal viewport`, 一般出现在专门对移动端做过适配的页面.
+  
+  
 * `window.innerWidth`和 `document.documentElement.clientWidth`的区别
   + ??? https://zhuanlan.zhihu.com/p/37031348
   ```
@@ -109,14 +125,20 @@
 	window.innerWidth
 	window.innerHeight
   ```
+  
+  
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
   + CSS动画更流畅，JS易导致页面掉帧。
   + CSS兼容性差
+  
+  
 * `requestAnimationFrame`是什么, 有什么作用
   + 用来代替`setTimeout`实现动画, 于requestAnimationFrame的功效只是一次性的，所以若想达到动画效果，则必须连续不断的调用requestAnimationFrame，就像我们使用setTimeout来实现动画所做的那样, 但是它的性能相对来说更好, 原因如下
     + 会把每一帧中的所有DOM操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
     + 在隐藏或不可见的元素中，requestAnimationFrame将不会进行重绘或回流，这当然就意味着更少的的cpu，gpu和内存使用量
+    
+    
 * `package.json`中库的版本号`^`和`~`的区别
   ```json
   "dependencies": {
@@ -130,6 +152,8 @@
   - PATCH：这个版本号变化了表示修复了bug，并且可以向后兼容。
   - 波浪符号（~）：他会更新到当前minor version（也就是中间的那位数字）中最新的版本。放到我们的例子中就是：body-parser:~1.15.2，这个库会去匹配更新到1.15.x的最新版本，如果出了一个新的版本为1.16.0，则不会自动升级。波浪符号是曾经npm安装时候的默认符号，现在已经变为了插入符号。
   - 插入符号（^）：这个符号就显得非常的灵活了，他将会把当前库的版本更新到当前major version（也就是第一位数字）中最新的版本。放到我们的例子中就是：bluebird:^3.3.4，这个库会去匹配3.x.x中最新的版本，但是他不会自动更新到4.0.0。
+  
+  
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
   + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
   + `<script>``<img>``<iframe>``<link>``<video>``<audio>``等带有`src`属性的标签默认支持跨域
@@ -164,6 +188,8 @@
     
     // 4. 还可以靠同源服务器代理（转发）请求。
   ```
+  
+  
 * `doctype`(文档类型) 的作用是什么 / 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么
   - DOCTYPE 主要用来引用该标记文档的 Document Type Definition (DTD), 以此告诉浏览器用什么样的解析规则来解析该文档.
   - 因为HTML4.01基于SGML(Standard Generalized Markup Language), 所以DOCTYPE需要对DTD进行引用
@@ -180,10 +206,16 @@
       `standard mode`不能设置
       `quirks mode`是可以设置 
   ```
+  
+  
 * 如果页面使用 'application/xhtml+xml' 会有什么问题吗？
   - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
+  
+  
 * 使用 `data-` 属性的好处是什么？
   - 自定义的data Chrome中可以用dataset来取得, 比如 data-house-id="13"  xx.dataset.houseId = 13
+  
+  
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
   - 都是同源的, 同时都保存在客户端
   - 可储存大小
@@ -196,19 +228,27 @@
   - 是否传递
     + 同时每次http请求都会自动带上cookie
     + sessionStorage, localStorage 则只在本地保存
+    
+    
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
   - https://segmentfault.com/q/1010000000640869
   - `<script>` 同步加载, 加载完成后立即执行
   - `<script async>` 异步加载, 加载立即执行, 不考虑多个script的先后顺序
   - `<script defer>` 异步加载, 执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成, 但是执行会按照声明script的顺序.
+  
+  
 * 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗 / 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
   - https://www.zhihu.com/question/309982596
   - css加载放HEAD防止FOUC(flash of unstyled content), 但是如果css过大可能导致白屏时间过长可以考虑放一部分非首屏可见元素的css在末尾.
   - js加载放末尾防止白屏时间过长. 但一些统计类js, 或是要网页面中添加内容的js可以考虑放在开头.
+  
+  
 * 什么是渐进式渲染 (progressive rendering)？
   - https://stackoverflow.com/questions/33651166/what-is-progressive-rendering
   - 目的:尽快让用户看到内容
   - 手段: 图片懒加载, 可视化内容优先(Server Side Rendering, SSR 只返回首屏可视化部分的html，已由服务器端渲染好)
+  
+  
 * 什么`mobile first`, 为什么需要`mobile first`
     ```
         // 区别在于`mobile-first`首先考虑移动端布局然后在这个基础上在添加以及改写样式来适配桌面端
@@ -240,9 +280,13 @@
         }
     ```
     - 这样做的原因是: 通常移动端的布局会更加简单, 移动端优先的方式有利于更好地复用以及简化代码
+    
+    
 * CSS 中类 (classes) 和 ID 的区别。
   - id用来标记一个 类用来标记很多个  
   - id优先级更高
+  
+  
 * 请问 "resetting" 和 "normalizing" CSS 之间的区别？你会如何选择，为什么？
   - https://www.jianshu.com/p/a7b9e2d20b73
   - 目的都是
@@ -250,16 +294,24 @@
   - CSS一般化修复了浏览器的自身bug并保持浏览器的一致性, 宗旨是保护有用的浏览器默认样式而不是完全去掉它们
   - `reset`的缺点在于浏览器调试工具中大段大段的继承链, 样式调试变得复杂
   - `normalized`保护了有价值的默认值(这样不需要为所有的排版元素都添加样式), 同时修复了浏览器的bug (这往往超出了Reset所能做到的范畴).
+  
+  
 * 请解释浮动 (Floats) 及其工作原理。
   - 强制block, 同时跳出文本流浮动元素从网页的正常流动中移出，但保留了部分的流动性，会影响其他元素的定位（比如文字会围绕着浮动元素）。这一点与绝对定位不同，绝对定位的元素完全从文档流脱离
   - 如果浮动元素的父元素只包含浮动元素，那么该父元素的高度会坍塌为0，我们可以通过清除（clear）从浮动元素后到父元素关闭前之间的浮动来修复这个问题(clear: both | left | right)
   - 把浮动元素的父元素属性设置为overflow: auto或overflow: hidden,会使其内部子元素形成BFC，并且父元素会扩张自己，使其能够包围它的子元素
+  
+  
 * 描述`z-index`和叠加上下文是如何形成的。
   - https://juejin.im/post/5b876f86518825431079ddd6
   - https://www.zhangxinxu.com/wordpress/2016/01/understand-css-stacking-context-order-z-index/
+  
+  
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
   - http://www.cnblogs.com/lhb25/p/inside-block-formatting-ontext.html
   - 消边距折叠 https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing
+  
+  
 * 列举不同的清除浮动的技巧，并指出它们各自适用的使用场景。
   - 末尾添加一个空div作为兄弟：`<div style="clear: both;"/>`
   - 给父元素添加一个伪类
@@ -271,6 +323,8 @@
     }
   ```
   - 父元素添加overflow: hidden | auto 或其他能够构成BFC的属性
+  
+  
 * 请解释 CSS sprites，以及你要如何在页面或网站中实现它。
   - 为了节省http请求数量, 提高网页性能, 将多张素材图片合并到一张大图中
   - 可维护差, 每次改动都需要图片
@@ -648,16 +702,76 @@
   }
   ```
 * 什么是闭包 (closure)，如何使用它，为什么要使用它？
-* 请举出一个匿名函数的典型用例？
+  - 函数内部定义的函数作为外部函数的返回值返回后, 借助返回的内部函数仍能访问到外部函数内的变量
+  - 构造私有变量
+  ```js
+  function createPrivate (value) {
+    return {
+      get () { return value },
+      set (newValue) { value = newValue }
+    }
+  }
+  ```
+  - 配合IIFE实现模块
+  ```
+  const module1 = (function () {
+    // define function, variable
+    
+    // return obj with defined function, variable insided
+    return { }
+  }())
+  ```
 * 请指出 JavaScript 宿主对象 (host objects) 和原生对象 (native objects) 的区别？
+  - 宿主对象是由运行时环境（浏览器或 Node）提供，比如window、XMLHTTPRequest等等
+  - 原生对象是由 ECMAScript 规范定义的 JavaScript 内置对象，比如String、Math、RegExp、Object、Function等等。
+  
 * 请指出以下代码的区别：`function Person(){}`、`var person = Person()`、`var person = new Person()`？
+  - `function Person() {}` 是函数定义
+  - `var person = Person()` 是普通的函数调用
+  - `var person = new Person()` 是使用`new`操作符构建Person对象的实例
+  
 * `.call` 和 `.apply` 的区别是什么？
   - 两者第一个参数都是指定上下文this, `call`剩下的参数数量不定, 会被原样传入调用函数, 而`apply`剩下的参数是一个数组, 会将该数组中的每个变量作为参数传入调用函数.
   - 据说某些JS引擎上 `call` 的性能更好
   - https://www.zhihu.com/question/61088667
+  
+* 请说明.forEach循环和.map()循环的主要区别，它们分别在什么情况下使用
+  - `forEach`主要用于依靠循环中的每一个值来进行一些操作, 本身不改变原数组也不返回新数组
+  - `map`是通过传入函数来声明旧数组和新数组的关系, 通过这种方式来构建并返回新数组
+  
 * 请解释 `Function.prototype.bind`？
+  ```
+  // 对普通函数
+  function kk (a, b, c) { console.log(this, a, b, c) }
+  var jj = kk.bind({}, 1, 2)
+  jj(3, 4, 5)
+  
+  // {} 1 2 3
+  
+  // 对箭头函数
+  var kk = (a, b, c) => { console.log(this, a, b, c) }
+  var jj = kk.bind({}, 1, 2)
+  jj(3, 4, 5)
+  
+  // Window 1 2 3
+  ```
+  
 * 在什么时候你会使用 `document.write()`？
+  - ??? 直接运行 会导致页面中 body 下内容被清空并改写为传入字符
+  
 * 请指出浏览器特性检测，特性推断和浏览器 UA 字符串嗅探的区别？
+  - 功能检测包括确定浏览器是否支持某段代码，以及是否运行不同的代码（取决于它是否执行），以便浏览器始终能够正常运行代码功能，而不会在某些浏览器中出现崩溃和错误。例如
+    ```js
+    if ('geolocation' in navigator) {
+      // 可以使用 navigator.geolocation
+    } else {
+      // 处理 navigator.geolocation 功能缺失
+    }
+    ```
+  - 特性推断：功能推断与功能检测一样，会对功能可用性进行检查，但是在判断通过后，还会使用其他功能，因为它假设其他功能也可用，也就是根据一个特性的存在推断另一个特性是否存在。问题是，推断是假设并非事实，而且可能导致可维护性的问题。
+  - UA字符串：这是一个浏览器报告的字符串，它允许网络协议对等方（network protocol peers）识别请求用户代理的应用类型、操作系统、应用供应商和应用版本。它可以通过navigator.userAgent访问。 然而，这个字符串很难解析并且很可能存在欺骗性。例如，Chrome 会同时作为 Chrome 和 Safari 进行报告。因此，要检测 Safari，除了检查 Safari 字符串，还要检查是否存在 Chrome 字符串。不要使用这种方式。
+  - 个人感觉UA字符串和UA头一样, 都是不靠谱的, 例如爬虫中可以随意设置UA头. 只不过UA字符串即navigator.userAgent是客户端浏览器自己识别客户机器的结果, 而UA头主要放在HTTP请求中.
+  
 * 使用 Ajax 都有哪些优劣？
   - 优势主要集中在:
     + 减轻了服务器压力
@@ -666,6 +780,7 @@
     + 搜索引擎支持较弱
     + 不安全, 暴露了服务器更多接口
     + 不支持浏览器前进,后退功能, 网页状态无法保留 可以通过前端路由进行解决
+    
 * 请解释变量声明提升 (hoisting)。
    ```js
    // 1. 变量声明提升, 注意是声明提升
@@ -695,10 +810,12 @@
    // Uncaught TypeError: go is not a function
    // 这种方式下类似是变量声明提升, 所以报错
    ```
+   
 * 请描述事件冒泡机制 (event bubbling)。
   + 现代浏览器中先捕获后冒泡, 也就是说标准DOM事件触发以后, 从根节点开始到target节点进行传播, 这个过程叫事件捕获, 然后从target节点传回根节点, 这个过程叫事件冒泡
   + `addEventListener(event, listener, useCapture)` 第三个参数默认为`false`, 表示不监听事件捕获, 监听事件冒泡. 
   + 如果此时给一个节点同时添加了两个监听事件, 一个捕获一个冒泡, 那么捕获监听器首先触发, 然后才是冒泡
+  
 * "attribute" 和 "property" 的区别是什么？
  - attribute是HTML标签上的特性，它的值只能够是字符串, node.attributes是一个类数组对象, property是DOM中的属性，是JavaScript里的对象
  - 如果一个非默认也就是自定义的属性添加的html的某个tag中, 只能通过`node.attributes.属性名`查到
@@ -711,30 +828,99 @@
     而node.属性名 是对DOM标准的实现, 例如input 应该有一个 `value` 的property, 所以不管写不写, input.value 都存在值.
  ```
  - https://www.cnblogs.com/elcarim5efil/p/4698980.html
-* 为何通常会认为保留网站现有的全局作用域 (global scope) 不去改变它，是较好的选择？
+ 
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
+  - load 触发比较慢, 需要等DOM以及相关资源全部加载完成之后才触发
+  - 而 DOMContentLoaded 的触发无需等待样式表, 图片等多媒体资源以及iframe等子框架的加载
+  
 * 请解释什么是单页应用 (single page app), 以及如何使其对搜索引擎友好 (SEO-friendly)。
-* 你使用过 Promises 及其 polyfills 吗? 请写出 Promise 的基本用法（ES6）。
+  - 开局一个HTML, 更新全靠AJAX
+  - SEO的话需要SSR或者其他预渲染工具
+
 * 使用 Promises 而非回调 (callbacks) 优缺点是什么？
+  - 条例清晰, 类似线性代码执行顺序, 防止回调地狱
+  - 当你无法确定请求是否真的是异步时, callback可能同步调用或者异步调用调用, 而Promise中的then总是晚于Promise中executor的执行的
+  ```
+  function callback (data) {
+    console.log( a );
+  }
+
+  var a = 0;
+
+  mayBeAsnyc(callback);
+  a++;
+  
+  // 无法确定到底a 是1 还是 2
+  ```
+  - callback可能调用太晚, 可以用`race`确保回调发生及时
+  - 确保只发生一次, 因为到了 Resolved 状态就不再改变了
 
 * 你会使用怎样的语言结构来遍历对象属性 (object properties) 和数组内容？
+  - 对象
+  ```
+  var child = Object.create({ inParentProp1: -1, inParentProp2: -2 })
+  child.inChildProp1 = 1
+  child.inChildProp2 = 2
+  Object.defineProperty(child, 'hiddenChildProp', { value: 3 })
+  
+  // 1. for ... in 遍历原型链上所有enumerable
+  for (const each in child) {console.log(each)}
+  //  VM105:1 inChildProp1
+  //  VM105:1 inChildProp2
+  //  VM105:1 inParentProp1
+  //  VM105:1 inParentProp2
+  
+  // 2. Object.keys 只包括该对象自身的enumerable
+  Object.keys(child)
+  // ["inChildProp1", "inChildProp2"]
+  
+  // 3. Object.getOwnPropertyNames 包括自身的所有, 包括非enumerable
+  Object.getOwnPropertyNames(child)
+  // ["inChildProp1", "inChildProp2", "hiddenChildProp"]
+  ```
+  - 数组
+  ```
+  var list = ['a', 'b', 'c', 'd']
+  
+  list.forEach((each, index) => { console.log(index + ': ' + each) })
+  // 0: a
+  // 1: b
+  // 2: c
+  // 3: d
+  // undefined (返回值)
+  
+  for (const each of list) { console.log(each) }
+  // VM3833:1 a
+  // VM3833:1 b
+  // VM3833:1 c
+  // VM3833:1 d
+  // undefined (返回值)
+  
+  for (let i = 0; i < list.length; ++i) {} // 
+  ```
+  
 * 请解释可变 (mutable) 和不变 (immutable) 对象的区别。
-  * 请举出 JavaScript 中一个不变性对象 (immutable object) 的例子？
-  * 不变性 (immutability) 有哪些优缺点？
-  * 如何用你自己的代码来实现不变性 (immutability)？
-* 解释 `function foo() {}` 与 `var foo = function() {}` 用法的区别
+  - 可变对象 在创建之后是可以被改变的, 
+  - 不可变的例如 string 和 number 从设计之初就是不可变(Immutable)
+  - 不可变那其实是保持一个对象状态不变，这样做的好处是使得开发更加简单，可回溯，测试友好，减少了任何可能的副作用。但是，每当你想添加点东西到一个不可变(Immutable)对象里时，它一定是先拷贝已存在的值到新实例里，然后再给新实例添加内容，最后返回新实例。相比可变对象，这势必会有更多内存、计算量消耗
+  - 尽量写纯函数, 使用const, 或利用 `Object.freeze()`, `Object.seal()`
 
-
-* 对代码进行测试的有什么优缺点？
 * 你会用什么工具测试你的代码功能？
+  - 只用过jest
+  
+  
 * 单元测试与功能/集成测试的区别是什么？
-* 代码风格 linting 工具的作用是什么？
-* 你会用什么工具来查找代码中的性能问题？
+  - 前者的测试是以项目中的小模块为单位
+  - 后者的测试时以项目小模块拼接后的整体来联合测试
+  
+  
 * 你会用什么方式来增强网站的页面滚动效能？
-* 请解释 layout、painting 和 compositing 的区别。
-* 为什么传统上利用多个域名来提供网站资源会更有效？
-* 请尽可能完整得描述从输入 URL 到整个网页加载完毕及显示在屏幕上的整个流程。
+  - 节流
+  
+  
 * Long-Polling、Websockets 和 Server-Sent Event 之间有什么区别？
+
+
 * 请描述以下 request 和 response headers：
   * Diff. between Expires, Date, Age and If-Modified-...
   * Do Not Track
