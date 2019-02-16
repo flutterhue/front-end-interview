@@ -1076,6 +1076,18 @@
    据研究，在网络环境好的情况下，发一次包的时间和发两次包的时间差别基本可以无视。而在网络环境差的情况下，两次包的TCP在验证数据包完整性上，有非常大的优点。 并不是所有浏览器都会在POST中发送两次包，Firefox就只发送一次。
   ```
   
+* 如何避免浏览器缓存get请求，以便达到每次get请求都能获取最新的数据
+  - 在请求的头部中加上`cache-control: no-cache`
+  - 在请求的url尾部加上'?r=随机数' e.g. www.host.com/somewhere.html?r=821293
+ 
+  
+* 什么是 HTTP method？请罗列出你所知道的所有 HTTP method，并给出解释。
+  - get
+  - post
+  - put
+  - delete
+  - 
+  
   
 * Websocket了解吗
   - webSocket和http一样，同属于应用层协议。它最重要的用途是实现了客户端与服务端之间的全双工通信，当服务端数据变化时，可以第一时间通知到客户端, 如果是http协议, 需要重新建立一个新的请求来发送信息.
@@ -1095,15 +1107,30 @@
   * ETag
   * X-Frame-Options
   
+
   
-* 什么是 HTTP method？请罗列出你所知道的所有 HTTP method，并给出解释。
-  - get
-  - post
-  - put
-  - delete
-  - 
-  
-  
+* HTTP 状态码了解多少
+  - 1xx ：1开头的状态码表示临时的响应
+  - 2xx ：请求成功
+  - 3xx ：请求被重定向
+  - 4xx ：请求错误，表明客户端发送的请求有问题
+  - 5xx ：服务器错误，表明服务端在处理请求时发生了错误
+  ```
+  一些常见的:
+    301 ： Moved Permanently 客户端请求的文档在其他地方，新的URL在location头中给出
+    304 ： Not Modified 客户端有缓存的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户端只想到指定日期后再更新文档）。服务器告诉客户，原来缓存的文档还可以继续使用。
+    400 ： Bad Request 请求出现语法错误
+    401 ： Unauthorized 访问被拒绝，客户端试图未经授权访问受密码保护的页面
+    403 ： Forbidden 资源不可用。服务器理解客户的请求，但拒绝处理它。通常由于服务器文件或目录的权限设置导致。
+    404 ： Not Found 无法找到指定位置的资源。
+    405 ： Method Not Allowed 请求方法（GET、POST、PUT等）对指定的资源不适用，用来访问本资源的HTTP方法不被允许。
+    500 ： Internal Server Error 服务器遇到了意料之外的情况，不能完成客户端的请求。
+    502 ： Bad Gateway 服务器作为网管或者代理时收到了无效的响应。
+    503 ： Service Unavailable 服务不可用，服务器由于维护或者负载过中未能应答。
+    504 ： Gateway Timeout 网关超时， 作为代理或网关的服务器不能及时的应答。
+  ```
+
+
 * 请解释 HTTP status 301 与 302 的区别？
   - 301 表示资源永久转移, 浏览器以后都用返回头中的新地址即可
   - 302 表示暂时转移（也许只是短暂的维护所以使用了一个临时的链接）, 浏览器以后还是用老地址
@@ -1170,3 +1197,5 @@ foo.x = foo = { n: 2 };
 https://github.com/h5bp/Front-end-Developer-Interview-Questions
 
 https://zhuanlan.zhihu.com/p/54397576
+
+https://zhuanlan.zhihu.com/p/32565654
