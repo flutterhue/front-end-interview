@@ -94,8 +94,8 @@
   + 详见 https://www.zhihu.com/question/20474326
   
 * 为什么传统上利用多个域名来提供网站资源会更有效？
- - CDN
- - 浏览器对单域名的并行数量有限
+  - 另一方面某些资源服务器可以避免不必要的Cookie的传递
+  - 浏览器对单域名的并行数量有限
 
 
 * 什么是viewport, 有什么作用??
@@ -156,10 +156,10 @@
   
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
   + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
-  + `<script>``<img>``<iframe>``<link>``<video>``<audio>``等带有`src`属性的标签默认支持跨域
+  + `<script>``<img>``<iframe>``<link>``<video>``<audio>`等带有`src`属性的标签默认支持跨域
   + 不同源的document或者js(例如iframe中的js)想要读取或者操作当前document将受到限制
   + 禁止Ajax发起跨域请求， 实际上请求会发起， 只不过返回响应会被浏览器拦截。
-  + Ajax跨域请求(注意是请求不是响应， 响应会被拦截)不能携带本网站Cookie
+  + Ajax跨域请求不能携带本网站Cookie
   + 跨域方式
   ```js
     // 1. JSONP
@@ -214,7 +214,7 @@
   
 * 使用 `data-` 属性的好处是什么？
   - 自定义的data Chrome中可以用dataset来取得, 比如 data-house-id="13"  xx.dataset.houseId = 13
-  
+  - 条例清晰, 利于维护
   
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
   - 都是同源的, 同时都保存在客户端
@@ -237,7 +237,7 @@
   - `<script defer>` 异步加载, 执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成, 但是执行会按照声明script的顺序.
   
   
-* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗 / 什么是 FOUC (无样式内容闪烁)？你如何来避免 FOUC？
+* 为什么通常推荐将 CSS `<link>` 放置在 `<head></head>` 之间，而将 JS `<script>` 放置在 `</body>` 之前？你知道有哪些例外吗 / 什么是 FOUC (Flash of Unstyled Content)？你如何来避免 FOUC？
   - https://www.zhihu.com/question/309982596
   - css加载放HEAD防止FOUC(flash of unstyled content), 但是如果css过大可能导致白屏时间过长可以考虑放一部分非首屏可见元素的css在末尾.
   - js加载放末尾防止白屏时间过长. 但一些统计类js, 或是要网页面中添加内容的js可以考虑放在开头.
@@ -493,8 +493,6 @@
   ```
   - 忽略 table
   
-* 请解释 inline 和 inline-block 的区别？
-  -
 
 * 如何去除inline-block元素间的间隙
   - 产生间隙的原因是标签间的空格
