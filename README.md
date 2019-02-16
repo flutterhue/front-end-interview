@@ -1062,6 +1062,11 @@
 * 你会用什么方式来增强网站的页面滚动效能？
   - 节流
   
+* 前端路由的实现思路？
+  - 考虑兼容性可以使用 `hashchange`, 缺点在于url之后总是带着一个#符号. e.g. www.host.com/#/index.html
+  - 不考虑兼容性的话可以使用 `pushState`, `replaceState`两个浏览器历史操作API以及`popstate`事件
+  - TODO具体实现
+  
   
 * Long-Polling、Websockets 和 Server-Sent Event 之间有什么区别？
 
