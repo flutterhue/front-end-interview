@@ -888,6 +888,17 @@
   ```
   
   
+  
+* 能否写一个bind函数的polyfill
+  ```
+    function bindPolyfill (fn, context, ...args) {
+        return function (...args2) {    
+            fn.apply(context, args.concat(args2))
+        }
+    }
+  ```
+
+  
 * 在什么时候你会使用 `document.write()`？
   - ??? 直接运行 会导致页面中 body 下内容被清空并改写为传入字符
   
