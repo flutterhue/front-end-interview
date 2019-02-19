@@ -1071,6 +1071,9 @@
 * 你会用什么方式来增强网站的页面滚动效能？
   - 节流
   
+* 如何实现浏览器访问url返回后图片下载
+  - 服务器设置响应头中`Content-Disposition=attachement;filename=xxxx`
+
 * 前端路由的实现思路？
   - 考虑兼容性可以使用 `hashchange`, 缺点在于url之后总是带着一个#符号. e.g. www.host.com/#/index.html
   - 不考虑兼容性的话可以使用 `pushState`, `replaceState`两个浏览器历史操作API以及`popstate`事件
