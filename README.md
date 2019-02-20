@@ -1103,6 +1103,9 @@
   
 * 讲讲TCP协议 连接三次握手, 断开四次握手
   ```
+  https://github.com/jawil/blog/issues/14
+  https://www.zhihu.com/question/24853633/answer/115173386
+  
   TCP A                                                TCP B
 
   0.  CLOSED                                               LISTEN
