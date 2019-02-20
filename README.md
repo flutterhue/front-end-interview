@@ -1100,7 +1100,37 @@
   - post
   - put
   - delete
-  - 
+  
+* 讲讲TCP协议 连接三次握手, 断开四次握手
+  ```
+  TCP A                                                TCP B
+
+  0.  CLOSED                                               LISTEN
+
+  1.  SYN-SENT    --> <SEQ=100><CTL=SYN>               --> SYN-RECEIVED
+
+  2.  ESTABLISHED <-- <SEQ=300><ACK=101><CTL=SYN,ACK>  <-- SYN-RECEIVED
+
+  3.  ESTABLISHED --> <SEQ=101><ACK=301><CTL=ACK><DATA> --> ESTABLISHED
+                       (Data is optional)
+		       ...
+               
+  0.  CLOSED                                               LISTEN
+
+  1.  FIN_WAIT_1  --> <SEQ=500><ACK=384><CTL=FIN>       --> SYN-RECEIVED
+
+  2.  FIN_WAIT_2 <-- <SEQ=384><ACK=501><CTL=SYN,ACK>   <-- SYN-RECEIVED
+  
+          ... A表示自己所有数据传输完成, 已经不发送数据了, 但是B仍可以向A发送数据
+  
+  3.  FIN_WAIT_2 <-- <SEQ=?><CTL=FIN>                  <-- LAST_ACK
+
+  4.  TIME_WAIT --> <SEQ=?><ACK=?><CTL=ACK>            --> Closed
+  
+  5.  2ms later timeout  
+  
+  6.  Closed                                               Closed
+  ```
   
   
 * Websocket了解吗
