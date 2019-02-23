@@ -683,7 +683,7 @@
 
     // 1.1 父类构造函数的定义
     function Animal (age) {
-      if (!this instanceof Animal) throw Error('Add new !')
+      if (!(this instanceof Animal)) throw new Error('Add new !')
       this.age = age
     }
 
@@ -695,7 +695,7 @@
     // 2.1 子类构造函数的定义
     function Cat (name, age) {
 
-      if (!this instanceof Cat) throw Error('Add new !')
+      if (!(this instanceof Cat)) throw new Error('Add new !')
       Animal.call(this, age)
       this.name = name
     }
