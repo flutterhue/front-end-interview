@@ -824,6 +824,47 @@
 	console.log('未定义')
   }
   ```
+* `typeof`, `instanceof` 的作用和原理
+  ```
+  JS基本类型有七种 Number, String, Boolean, Null, Undefined, Symbol, Object
+  
+  
+  ------------- typeof ----------------
+  
+    console.log(typeof null)  // object
+    console.log(typeof undefined)  // undefined
+    console.log(typeof 12.23)  // number
+    console.log(typeof true)  // boolean
+    console.log(typeof 'str')  // string
+    console.log(typeof Symbol(3))  // symbol
+    console.log(typeof (() => {}))  // function
+    console.log(typeof /re/)  // object
+    console.log(typeof {})  // object
+    console.log(typeof [])  // object
+
+  可以看到有一些特殊的情况
+    1. null 被判断为对象
+    2. (() => {}) 被判断为函数(实际上也是特殊的对象)
+    
+    
+  ------------- instanceof ---------------
+  
+  原理是沿着左边对象的原型链不断地寻找右边的Prototype(所以右边必须是一个非箭头的可调用对象 i.e 函数), 如果能在原型链上找到右边, 返回 true
+  
+  
+  ```
+  
+* `'hello'`, `String('hello')`, `new String('hello')`有区别吗?
+  ```
+  let str1 = 'hello'
+  let str2 = String('hello')
+  let str3 = new String('hello')
+  
+  console.log(typeof str1)    // string
+  console.log(typeof str3)    // object
+  console.log(str1 === str2)  // true
+  console.log(str1 === str3)  // false
+  ```
   
   
 * 什么是闭包 (closure)，如何使用它，为什么要使用它？
