@@ -997,8 +997,14 @@ function deepCopy2(targetObj) {
   return helper(targetObj)
 }
 
+// 当然 如果钻牛角尖的话 这个问题还有更多方向可以考虑
+//   1. enumerable为false 考虑使用 Object.getOwnPropertyDescriptors() + Object.create() 进行浅拷贝
+//   2. 由于for-in不循环Symbol, 且上面进行的是浅拷贝, 如果要深拷贝的话, 可以专门使用 Object.getOwnPropertySymbols() 进行遍历
+//   3. 同时系统也提供了一部分API 例如`MessageChannel`等等.
+
 // https://juejin.im/post/5ad6b72f6fb9a028d375ecf6
 // https://zhuanlan.zhihu.com/p/33489557
+// http://jerryzou.com/posts/dive-into-deep-clone-in-javascript/
 ```
   
   
