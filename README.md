@@ -931,6 +931,75 @@
     return { }
   }())
   ```
+
+
+* 深拷贝
+```js
+let loop = {}
+loop.self = loop
+
+function Building(type) {
+  this.type = type
+}
+Building.prototype.canMove = function() {
+  return false
+}
+function School(type) {
+  if (!(this instanceof School)) {
+    throw new Error('WHERE IS UR NEW')
+  }
+
+  Building.call(this, type)
+  this.people = [{ name: 'xx' }, { name: 'yy' }]
+  this.say = function() {
+    console.log('school')
+  }
+}
+
+function helper() {}
+helper.prototype = Building.prototype
+School.prototype = new helper()
+
+let school = new School('A+')
+
+// 1. 不支持循环引用
+// 2. 不拷贝函数
+// 3. 不拷贝原型链
+// 4. 支持的内置对象有限, 例如正则对象/re/就不支持
+// 5. 不拷贝Symbol
+function deepCopy1(targetObj) {
+  return JSON.parse(JSON.stringify(targetObj))
+}
+
+// 1. 非深拷贝函数
+// 2. 原型链上属性以及函数被移到对象本身上
+// 3. 支持的内置对象有限, 例如正则对象/re/就不支持
+// 4. 前拷贝Symbol
+function deepCopy2(targetObj) {
+  function notObject(obj) {
+    return obj === null || typeof obj !== 'object'
+  }
+  function helper(targetObj) {
+    if (record.has(targetObj)) return record.get(targetObj)
+
+    let re = Array.isArray(targetObj) ? [] : {}
+    record.set(targetObj, re)
+    for (const each in targetObj) {
+      re[each] = notObject(targetObj[each])
+        ? targetObj[each]
+        : helper(targetObj[each])
+    }
+    return re
+  }
+
+  if (notObject(targetObj)) return targetObj
+  let record = new WeakMap()
+  return helper(targetObj)
+}
+
+// https://juejin.im/post/5ad6b72f6fb9a028d375ecf6
+// https://zhuanlan.zhihu.com/p/33489557
+```
   
   
 * 请指出 JavaScript 宿主对象 (host objects) 和原生对象 (native objects) 的区别？
