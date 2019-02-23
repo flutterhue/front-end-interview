@@ -671,7 +671,7 @@
     
     
 * 使用es5实现es6的class
-  ```
+  ```js
     // 工具函数 
     // 代替es6中的Object.create
     // 返回一个空对象其原型为传入的prototype
@@ -715,7 +715,7 @@
          this.age = age 
        }
 
-       logAge () { console.log(this.age) 
+       logAge () { console.log(this.age) }
     }
     
     class Cat extends Animal {
@@ -815,7 +815,7 @@
   - `null` 表示空对象, 但是使用`typeof null` 会返回 "object", 判断null直接用 === 即可
   - `undefined` 表示 var, let, const 声明了但没有赋值的变量, 连同 `undeclared` 变量一起, typeof 都会返回 'undefined'
   - 由于`undeclared`的变量直接引用会报错, 所以不能直接判断
-  ```
+  ```js
   // 以下方式可区分后两者
   try{
 	a // 要检测的变量名
@@ -824,12 +824,14 @@
 	console.log('未定义')
   }
   ```
+
+
 * `typeof`, `instanceof` 的作用和原理
-  ```
-  JS基本类型有七种 Number, String, Boolean, Null, Undefined, Symbol, Object
+  ```js
+  // JS基本类型有七种 Number, String, Boolean, Null, Undefined, Symbol, Object
   
   
-  ------------- typeof ----------------
+  // ------------- typeof ----------------
   
     console.log(typeof null)  // object
     console.log(typeof undefined)  // undefined
@@ -842,20 +844,62 @@
     console.log(typeof {})  // object
     console.log(typeof [])  // object
 
-  可以看到有一些特殊的情况
-    1. null 被判断为对象
-    2. (() => {}) 被判断为函数(实际上也是特殊的对象)
+  // 可以看到有一些特殊的情况
+  //   1. null 被判断为对象
+  //   2. (() => {}) 被判断为函数(实际上也是特殊的对象)
     
     
-  ------------- instanceof ---------------
+  // ------------- instanceof ---------------
   
-  原理是沿着左边对象的原型链不断地寻找右边的Prototype(所以右边必须是一个非箭头的可调用对象 i.e 函数), 如果能在原型链上找到右边, 返回 true
-  
-  
+  // 原理是沿着左边对象的原型链不断地寻找右边的Prototype
+  // 所以右边必须是一个非箭头函数的可调用对象 i.e 普通函数
+
+  function instanceofPolyfill (leftValue, rightValue) {
+    if (leftValue === null) return false
+    let rightProto = rightValue.prototype // 取右表达式的 prototype 值
+    leftValue = Object.getPrototypeOf(leftValue) // 取左表达式的__proto__值
+    while (true) {
+    	if (leftValue === null) return false
+      if (leftValue === rightProto) return true
+      leftValue = Object.getPrototypeOf(leftValue)
+    }
+  }
+
+
+  // 判断类型可以用另外一种方式 `Object.prototype.toString`, 对各种内置类型都有较好的支持
+
+  Object.prototype.toString.call(1) // "[object Number]"
+  Object.prototype.toString.call('hi') // "[object String]"
+  Object.prototype.toString.call({a:'hi'}) // "[object Object]"
+  Object.prototype.toString.call([1,'a']) // "[object Array]"
+  Object.prototype.toString.call(true) // "[object Boolean]"
+  Object.prototype.toString.call(() => {}) // "[object Function]"
+  Object.prototype.toString.call(null) // "[object Null]"
+  Object.prototype.toString.call(undefined) // "[object Undefined]"
+  Object.prototype.toString.call(Symbol(1)) // "[object Symbol]"
+
+  ```
+
+
+* 为什么`Object instanceof Function`并且`Function instanceof Object`
+  - 按照JS的规范, 所有的对象都是Object的实例, 所有函数都是Function的实例
+  - 函数也是对象, 也就是说Function本身是一个对象, 所以`Function instanceof Object`
+  - 同时Object本身也是一个函数, 所以`Object instanceof Function`
+  ```js
+    // https://stackoverflow.com/a/46895582/5817139
+    // Object ---> Function.prototype ---> Object.prototype ---> null
+    // Function ---> Function.prototype ---> Object.prototype ---> null
+
+    console.log(Object.__proto__ === Function.prototype) // true
+    console.log(Object.__proto__.__proto__ === Object.prototype) // true
+    console.log(Object.__proto__.__proto__.__proto__ === null) // true
+
+    console.log(Function.__proto__ === Function.prototype) // true
+    console.log(Function.__proto__.__proto__ === Object.prototype) // true
   ```
   
 * `'hello'`, `String('hello')`, `new String('hello')`有区别吗?
-  ```
+  ```js
   let str1 = 'hello'
   let str2 = String('hello')
   let str3 = new String('hello')
@@ -1183,13 +1227,13 @@
   
   TCP A                                                TCP B
 
-  0.  CLOSED                                               LISTEN
+  1.  CLOSED                                               LISTEN
 
-  1.  SYN-SENT    --> <SEQ=100><CTL=SYN>               --> SYN-RECEIVED
+  2.  SYN-SENT    --> <SEQ=100><CTL=SYN>               --> SYN-RECEIVED
 
-  2.  ESTABLISHED <-- <SEQ=300><ACK=101><CTL=SYN,ACK>  <-- SYN-RECEIVED
+  3.  ESTABLISHED <-- <SEQ=300><ACK=101><CTL=SYN,ACK>  <-- SYN-RECEIVED
 
-  3.  ESTABLISHED --> <SEQ=101><ACK=301><CTL=ACK><DATA> --> ESTABLISHED
+  4.  ESTABLISHED --> <SEQ=101><ACK=301><CTL=ACK><DATA> --> ESTABLISHED
                        (Data is optional)
 		       ...
                
