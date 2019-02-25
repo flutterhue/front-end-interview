@@ -7,6 +7,40 @@
     3. layout: 基于rendering tree, 浏览器开始计算各个节点内容在屏幕上的位置
     4. paint: 按照上一步计算的结果在浏览器上进行绘制
     5. script 解析
+
+  - 浏览器修改DOM是同步还是异步
+    + 实际上浏览器对于DOM本身结构的修改是同步的, 但是真实体现在浏览器的表现层面上就是异步的, 也就是说之后会根据同步修改过的DOM去更新web view.
+    + 原因在于浏览器会将DOM的修改暂存在一个队列中, 当前代码执行完成后再集中渲染.
+    + 总的来说就是 DOM树的修改是同步的(js可以立即获取元素)，渲染到屏幕上是异步的(不一定即时看到)
+    + 以下代码渲染结果是都是 0 1 2 3 4 5, 而不是 5 5 5 5 5说明DOM本身修改是同步的, 同时可以立即使用JS获取到class为666的标签
+    ```html
+    <ul>
+    <li id="i0"></li>
+    <li id="i1"></li>
+    <li id="i2"></li>
+    <li id="i3"></li>
+    <li id="i4"></li>
+    </ul>
+    <ul id="newEle"></ul>
+
+    <script>
+    for(var i = 0;i<5;i++){
+        var item = document.getElementById('i'+i);
+        item.innerHTML = i;
+    }
+    var newEle = document.getElementById('newEle');
+    for(i=0;i<5;i++){
+        var li = document.createElement("li");
+        li.className = "666"
+        li.innerHTML = i;
+        newEle.appendChild(li);
+    }
+    console.log(document.getElementsByClassName('666'))
+    </script>  
+    ```
+    + https://segmentfault.com/a/1190000005803237
+
+
   - 几个概念
     + layout(布局)或者reflow(回流), 某个部分发生了变化影响了布局，渲染树需要重新计算，计算出每一个渲染对象的位置和尺寸，将其安置在浏览器窗口的正确位置，而有些时候我们会在文档布局完成后对DOM进行修改，这时候可能需要重新进行布局，也可称其为回流，本质上还是一个布局的过程，每一个渲染对象都有一个布局或者回流方法，实现其布局或回流。
     + paint(绘制)或repaint(重绘)浏览器UI组件将遍历渲染树并调用渲染对象的绘制（paint）方法，将内容展现在屏幕上，也有可能在之后对DOM进行修改，需要重新绘制渲染对象，也就是重绘，绘制和重绘的关系可以参考布局和回流的关系. 改变了某个元素的背景颜色，文字颜色等，不影响元素周围或内部布局的属性，将只会引起浏览器的repaint，根据元素的新属性重新绘制，使元素呈现新的外观。重绘不会带来重新布局，并不一定伴随重排；Reflow要比Repaint更花费时间，也就更影响性能。所以在写代码的时候，要尽量避免过多的Reflow。
