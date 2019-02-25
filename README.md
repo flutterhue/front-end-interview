@@ -7,8 +7,33 @@
     3. layout: 基于rendering tree, 浏览器开始计算各个节点内容在屏幕上的位置
     4. paint: 按照上一步计算的结果在浏览器上进行绘制
     5. script 解析
+  - 几个概念
+    + layout(布局)或者reflow(回流), 某个部分发生了变化影响了布局，渲染树需要重新计算，计算出每一个渲染对象的位置和尺寸，将其安置在浏览器窗口的正确位置，而有些时候我们会在文档布局完成后对DOM进行修改，这时候可能需要重新进行布局，也可称其为回流，本质上还是一个布局的过程，每一个渲染对象都有一个布局或者回流方法，实现其布局或回流。
+    + paint(绘制)或repaint(重绘)浏览器UI组件将遍历渲染树并调用渲染对象的绘制（paint）方法，将内容展现在屏幕上，也有可能在之后对DOM进行修改，需要重新绘制渲染对象，也就是重绘，绘制和重绘的关系可以参考布局和回流的关系. 改变了某个元素的背景颜色，文字颜色等，不影响元素周围或内部布局的属性，将只会引起浏览器的repaint，根据元素的新属性重新绘制，使元素呈现新的外观。重绘不会带来重新布局，并不一定伴随重排；Reflow要比Repaint更花费时间，也就更影响性能。所以在写代码的时候，要尽量避免过多的Reflow。
+    + DOM的增加删除移动, 页面内容的变更, 浏览器窗口的大小变化或者滚动等会影响节点位置的操作都将导致reflow.
+    + 只发送重绘通常来说是一下几个元素样式发送了变化`color`, `background-color`, `visibility`
+  - 如果避免(过多不必要的回流和重绘)
+    + 将动画效果应用到position属性为absolute或fixed的元素上（脱离文档流）
+    + 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性
+    + 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中, 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘
+    + 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来
+     ```
+        现代浏览器会对频繁的回流或重绘操作进行优化：
+        浏览器会维护一个队列，把所有引起回流和重绘的操作放入队列中，如果队列中的任务数量或者时间间隔达到一个阈值的，浏览器就会将队列清空，进行一次批处理，这样可以把多次回流和重绘变成一次。
+        当你访问以下属性或方法时，浏览器会立刻清空队列：
 
-  - 浏览器修改DOM是同步还是异步
+        clientWidth、clientHeight、clientTop、clientLeft
+        offsetWidth、offsetHeight、offsetTop、offsetLeft
+        scrollWidth、scrollHeight、scrollTop、scrollLeft
+        width、height
+        getComputedStyle()
+        getBoundingClientRect()
+
+        因为队列中可能会有影响到这些属性或方法返回值的操作，即使你希望获取的信息与队列中操作引发的改变无关，浏览器也会强行清空队列，确保你拿到的值是最精确的。
+     ```
+     
+     
+  * 浏览器修改DOM是同步还是异步
     + 实际上浏览器对于DOM本身结构的修改是同步的, 但是真实体现在浏览器的表现层面上就是异步的, 也就是说之后会根据同步修改过的DOM去更新web view.
     + 原因在于浏览器会将DOM的修改暂存在一个队列中, 当前代码执行完成后再集中渲染.
     + 总的来说就是 DOM树的修改是同步的(js可以立即获取元素)，渲染到屏幕上是异步的(不一定即时看到)
@@ -41,32 +66,7 @@
     + https://segmentfault.com/a/1190000005803237
 
 
-  - 几个概念
-    + layout(布局)或者reflow(回流), 某个部分发生了变化影响了布局，渲染树需要重新计算，计算出每一个渲染对象的位置和尺寸，将其安置在浏览器窗口的正确位置，而有些时候我们会在文档布局完成后对DOM进行修改，这时候可能需要重新进行布局，也可称其为回流，本质上还是一个布局的过程，每一个渲染对象都有一个布局或者回流方法，实现其布局或回流。
-    + paint(绘制)或repaint(重绘)浏览器UI组件将遍历渲染树并调用渲染对象的绘制（paint）方法，将内容展现在屏幕上，也有可能在之后对DOM进行修改，需要重新绘制渲染对象，也就是重绘，绘制和重绘的关系可以参考布局和回流的关系. 改变了某个元素的背景颜色，文字颜色等，不影响元素周围或内部布局的属性，将只会引起浏览器的repaint，根据元素的新属性重新绘制，使元素呈现新的外观。重绘不会带来重新布局，并不一定伴随重排；Reflow要比Repaint更花费时间，也就更影响性能。所以在写代码的时候，要尽量避免过多的Reflow。
-    + DOM的增加删除移动, 页面内容的变更, 浏览器窗口的大小变化或者滚动等会影响节点位置的操作都将导致reflow.
-    + 只发送重绘通常来说是一下几个元素样式发送了变化`color`, `background-color`, `visibility`
-  - 如果避免(过多不必要的回流和重绘)
-    + 将动画效果应用到position属性为absolute或fixed的元素上（脱离文档流）
-    + 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性
-    + 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中, 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘
-    + 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来
-     ```
-        现代浏览器会对频繁的回流或重绘操作进行优化：
-        浏览器会维护一个队列，把所有引起回流和重绘的操作放入队列中，如果队列中的任务数量或者时间间隔达到一个阈值的，浏览器就会将队列清空，进行一次批处理，这样可以把多次回流和重绘变成一次。
-        当你访问以下属性或方法时，浏览器会立刻清空队列：
 
-        clientWidth、clientHeight、clientTop、clientLeft
-        offsetWidth、offsetHeight、offsetTop、offsetLeft
-        scrollWidth、scrollHeight、scrollTop、scrollLeft
-        width、height
-        getComputedStyle()
-        getBoundingClientRect()
-
-        因为队列中可能会有影响到这些属性或方法返回值的操作，即使你希望获取的信息与队列中操作引发的改变无关，浏览器也会强行清空队列，确保你拿到的值是最精确的。
-     ```
-     
-     
 * 浏览器中DOMContentLoaded, load等等事件的触发顺序
   + https://github.com/fi3ework/BLOG/issues/3
   + `DOMContentLoaded` —— 浏览器已经完全加载了 HTML，DOM 树已经构建完毕，但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
@@ -103,6 +103,12 @@
   `document.readyState` 在 `DOMContentLoaded` 前一刻变为 `interactive`，这两个事件可以认为是同时发生。
   `document.readyState` 在所有资源加载完毕后（包括 `iframe` 和 `img`）变成 `complete`，我们可以看到`complete`、 `img.onload` 和         `window.onload` 几乎同时发生，区别就是 `window.onload` 在所有其他的 `load` 事件之后执行
   ```
+
+
+* 知道`postMessage`吗? 讲一讲它的用途
+  + 最常见的一种用途是实现非同源窗口之间的跨域, 注意它的优势在于不需要共享一个父domain  
+  + 在 Web Workers 中, 也就是HTML5新提出的JS多线程中的工作线程
+  + 用于对象深拷贝
   
   
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
@@ -195,33 +201,129 @@
   + 禁止Ajax发起跨域请求， 实际上请求会发起， 只不过返回响应会被浏览器拦截。
   + Ajax跨域请求不能携带本网站Cookie
   + 跨域方式
-  ```js
-    // 1. JSONP
-    利用`<script><img><iframe>`标签默认跨域的特征, 所以该方式只支持get方法
-    与服务器约定好， 让服务器返回一个`script`并在其中回调页面中的函数， 页面所需的数据作为调用参数
-    
-    // html
-    // <script type="text/javascript" src="http://a.com/index.js">
-    //  function showTable(tableData){
-    //   需要ajax获取服务器端表单数据
-    // }
-    // </script>
-    // <script type="text/javascript" src="http://b.com/remote.js"></script> 
-    // 当然也可以用 document.createElement('script') 动态生产script
-    
-    
-    // 服务器端返回的remote.js脚本
-    showTable ({ name: 'Fred', age: 22 })
-    
-    // 2.  Cross-Origin Resource Sharing(CORS)
-    // 在跨域服务器中的响应头部中加入`Access-Control-Allow-Origin`表示服务器允许哪些域可以访问该资源
-    // Access-Control-Allow-Origin: <origin> | *
-    // 包括该字段之外， 还有`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age` 等等字段配合达到更强大的效果
-    
-    // 3. 父子域之间还可以考虑 `document.domain`,  `location.hash`等方式
-    
-    // 4. 还可以靠同源服务器代理（转发）请求。
-  ```
+  + 单向跨域: 一般异步获取数据 
+    1. JSONP: 利用`<script><img><iframe>`标签默认跨域的特征, 所以该方式只支持get方法
+      与服务器约定好， 让服务器返回一个`script`并在其中回调页面中的函数， 页面所需的数据作为调用参数
+    ```html
+      <script type="text/javascript" src="http://a.com/index.js">
+        function showTable(tableData) {
+         需要ajax获取服务器端表单数据
+       }
+       </script>
+      // 当然也可以用 document.createElement('script') 动态生产script
+       <script type="text/javascript" src="http://b.com/remote.js"></script> 
+
+      // 服务器端返回的remote.js脚本
+      // showTable ({ name: 'Fred', age: 22 })
+    ```
+    2. Cross-Origin Resource Sharing(CORS)
+      1. 在跨域服务器中的响应头部中加入`Access-Control-Allow-Origin`表示服务器允许哪些域可以访问该资源
+      2. Access-Control-Allow-Origin: <origin> | *
+      3.包括该字段之外， 还有`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age` 等等字段配合达到更强大的效果
+    3. 反向代理服务器, 即将自己的服务器进行配置, 然后由服务器请求数据后返回给页面.
+  + 双向跨域: 主要用于多窗口间的信息互相传递
+    1. `使用document.doomain`, 但限制在于创体检的基础域名必须相同.
+      ```html
+      // 该页面本身为 http://www.domain.cn/A.html
+      <iframe id="iframe" src="http://domain.cn/B.html" onload="test()">
+      </iframe>
+      <script type="text/javascript">
+        document.domain = 'domain.cn';//设置成主域
+        function test(){
+          // contentWindow 可取得子窗口的 window 对象
+          // 如果跨域成功 window 对象中会有更多属性 如用来操作子窗口
+          // 内容的document等等较为敏感的属性才能获取到
+          alert(document.getElementById('￼iframe').contentWindow)
+        }
+      </script> 
+      <script type="text/javascript">
+          //在iframe载入这个页面也设置document.domain, 两者域名必须一致
+          document.domain = 'domain.cn'
+      </script>
+      ```
+    2. `location.hash`能够实现完全不同源的页面之间的相互通信, 主要原理就是利用`iframe`窗体可以设置父窗体的location.hash来实现. 例如
+    ```html
+      // 该页面本身为 http://www.domain1.cn/index.html
+      <iframe id="iframe" src="http://domain2.cn/index.html" onload="test()">
+      </iframe>
+
+      // 该页面本身为 http://www.domain2.cn/index.html
+      <script>
+        parent.location.hash = "wangbadan"
+      </script>
+
+      // 页面成功加载后可以发现 `domain1.cn/index.html`的地址变成了
+      // http://www.domain1.cn/index.html#wangbadan
+    ```
+    3. `window.name`也能实现完全不同源页面之间通信, 利用的是同一个窗口的`window.name`即使载入新的网址也不发生变化这个特征, 支持的name值最长可以为2M.
+    ```html
+    // 该html地址是 http://127.0.0.1:8080/index.html (异源父页面)
+    <iframe id="if1" src="http://127.0.0.1:8081/index.html"></iframe>
+    <script type="text/JavaScript">
+      setTimeout(() => {
+          // 必须确保iframe页面已经加载好, 也就是数据已经被存入子窗口的 window.name
+          // 这里用settimeout 1s 实际并不严谨 可以让子窗口修改父窗口hash的方式来准确判断
+          // 改为同源窗口
+          document.getElementById('if1').src = './index2.html'
+      }, 1000);
+      setTimeout(() => {
+          // 必须确保iframe页面已经加载好, 也就是数据已经被子窗口读取到
+          // 由于此时是同源窗口, 作为父窗口可以读取子窗口的window.name
+          console.log(document.getElementById('if1').contentWindow.name)
+          // 由于此时是同源窗口, 作为父窗口可以设置子窗口的window.name
+          document.getElementById('if1').contentWindow.name = '来自父窗口的回复'
+          // 把地址改为异源, 通过window.name 传回数据
+          document.getElementById('if1').src = 'http://127.0.0.1:8081/index.html'
+      }, 2000);
+    </script>
+
+    // 该html地址是 http://127.0.0.1:8081/index.html (异源子页面)
+    <script>
+      if (window.name === '') {
+        // 第一次访问，填入数据
+        window.name = '来自端口8081的异源子页面的数据'
+      } else {
+        // 第二次访问， 读取数据来自父页面发回的数据
+        console.log(window.name)
+      }
+    </script>
+    ```
+    4. 使用HTML5全新API `window.postMessage` 进行跨域
+    ```html
+    // 该html地址是 http://127.0.0.1:8080/index.html (异源父页面)
+    <iframe id="if1" src="http://127.0.0.1:8081/index.html"></iframe>
+    <script type="text/JavaScript">
+    setTimeout(() => {
+      // 向子窗口发送信息
+      document.getElementById('if1')
+        .contentWindow
+        .postMessage('父亲: 吃了吗', 'http://127.0.0.1:8081')
+
+      // 向自己发送信息 postMessage是异步的, 所以可以写在监听事件绑定的前面
+      // 第二个参数 * 表示发送给任意地址的窗口, 但是感觉this已经控制了发送
+      // 的指向, 不知道这个参数还有什么作用
+      window.postMessage('???', '*')
+
+      // 准备接受信息
+      window.onmessage = e => {
+        console.log(e.data)
+      }
+    }, 1000)
+    </script>
+
+    // 该html地址是 http://127.0.0.1:8081/index.html (异源子页面)
+    <script>
+      window.onmessage = e => {
+        console.log(e)
+        console.log(e.data)
+        e.source.postMessage('儿子：吃了', e.origin)
+        // e.source 是发送来源窗口的引用 在这里也就是parent
+        // e.origin 是发送来源的地址 也即是 http://127.0.0.1:8080
+      }
+    </script>
+
+
+    ```
   
   
 * `doctype`(文档类型) 的作用是什么 / 浏览器标准模式 (standards mode) 、几乎标准模式（almost standards mode）和怪异模式 (quirks mode) 之间的区别是什么
