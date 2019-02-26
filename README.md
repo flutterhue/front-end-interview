@@ -348,9 +348,12 @@
   - 这是服务器http返回头部中的? xhtml 语法要求严格，必须有head、body 每个dom 必须要闭合。空标签也必须闭合。例如`<img />, <br/>, <input />`等。另外要在属性值上使用双引号。一旦遇到错误，立刻停止解析，并显示错误信息。如果页面使用'application/xhtml+xml',一些老的浏览器会不兼容。
   
   
+
 * 使用 `data-` 属性的好处是什么？
   - 自定义的data Chrome中可以用dataset来取得, 比如 data-house-id="13"  xx.dataset.houseId = 13
   - 条例清晰, 利于维护
+
+
   
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
   - 都是同源的, 同时都保存在客户端
@@ -359,12 +362,44 @@
     + sessionStorage, localStorage 大小限制可以达到5M甚至更多
   - 过期时间长短
     + cookie 在设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
-    + sessionStorage 数据在当前浏览器窗口关闭后自动删除, 在同一session间共享（https://github.com/lmk123/blog/issues/66）
+    + sessionStorage 数据在当前浏览器窗口关闭后自动删除, 在同一session间共享, 同一session包括当前页面以及从当前页面点开的同源页面, 但是如果是直接打开新Tab则会初始化一个新的session.(https://github.com/lmk123/blog/issues/66)
     + localStorage 存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
   - 是否传递
     + 同时每次http请求都会自动带上cookie
     + sessionStorage, localStorage 则只在本地保存
+  - Cookie 通常用于登录状态的保存等功能的实现
+  - sessionStorage由于只有当前session有效果, 所以通常用来在单页应用中方便各个模块的数据传递
+  - 由于localStorage的存储性质, 通常用来存储一些不需要和服务器进行交互的数据, 例如在线编辑文章的自动保存
+
+
+* 除了上面提到的三种, 还有吗? (实际上这里问的应该是缓存而不是储存了)
+  - 应用程序缓存，是从浏览器的缓存中分出来的一块缓存区，要想在这个缓存中保存数据，可以使用一个描述文件（manifest file），列出要下载和缓存的资源。
+
+
+* 如何把`document.cookie` 转化为对象
+  ```js
+  function cookie2obj () {
+    const list = document.cookie.split('; ')
+    const obj = {}
+    for (const each of list) {
+      const temp = each.split('=')
+      obj[temp[0]] = temp[1]
+    }
+    return obj
+  }
+  ```
     
+
+
+* 既然前端可以自由的设置cookie, 会不会不安全? 考虑过`cookie`的安全问题吗?
+  + 服务器端返回cookie时, 对于某些敏感的cookie设置httpOnly为true, 这种cookie是无法通过document.cookie拿到的, 所以也就无法修改. 同时只会在发送请求的时候被附带, 使用脚本AJAX时由于无法获取, 所以也不会被带上.
+  + https://zhuanlan.zhihu.com/p/36197012
+  + 尽可能地设置有效期较短的cookie， 也就是增加expires/max-age (前者是HTTP1.0中的表示绝对时间后者是1.1新规范表示相对时间, 一般为保证兼容性都写), 或者干脆不写或者写一个早于当前时间的日期, 这样的话cookie将会随着Session一起过期
+  + 给cookie添加secure: true, 表示只在https协议下传输.
+  + 给敏感的cookie加密或者哈希
+
+
+
     
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
   - https://segmentfault.com/q/1010000000640869
@@ -1422,6 +1457,11 @@ function deepCopy2(targetObj) {
 * 如何避免浏览器缓存get请求，以便达到每次get请求都能获取最新的数据
   - 在请求的头部中加上`cache-control: no-cache`
   - 在请求的url尾部加上'?r=随机数' e.g. www.host.com/somewhere.html?r=821293
+
+
+* 正常情况下缓存, 只有但是一旦有新的版本上线, 如何做到让浏览器使用最新的数据呢
+  - 上面提到的两者方式, 会导致每次都去请求, 这显然不是我们需要的, 我们只需要每次有新版本采取请求
+  - 可以使用文件尾部加上版本号的方式 例如在url的尾部加上'?v=20180101', 这里使用了年月日作为版本号, 一旦有新版本上线, 只需要在html script 标签中 (这里考虑js的缓存) 修改版本号即可
 
 
 * 聊聊浏览器中关于缓存的问题
