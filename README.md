@@ -372,9 +372,6 @@
   - 由于localStorage的存储性质, 通常用来存储一些不需要和服务器进行交互的数据, 例如在线编辑文章的自动保存
 
 
-* 除了上面提到的三种, 还有吗? (实际上这里问的应该是缓存而不是储存了)
-  - 应用程序缓存，是从浏览器的缓存中分出来的一块缓存区，要想在这个缓存中保存数据，可以使用一个描述文件（manifest file），列出要下载和缓存的资源。
-
 
 * 如何把`document.cookie` 转化为对象
   ```js
@@ -401,6 +398,14 @@
 
 
     
+* 除了上面提到的三种, 还有吗? 
+  - 前端数据库, 相比sessionStorage/localStorage, 可存储的容量更大, 主要包含以下两种
+  - Web SQL, W3似乎已经宣布放弃维护该规范标准
+  - IndexedDB, 是一种存储在浏览器即客户端本地的类NoSQL数据库, 它是比Web SQL更符合前端的需求.
+
+
+
+
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
   - https://segmentfault.com/q/1010000000640869
   - `<script>` 同步加载, 加载完成后立即执行
@@ -1464,8 +1469,15 @@ function deepCopy2(targetObj) {
   - 可以使用文件尾部加上版本号的方式 例如在url的尾部加上'?v=20180101', 这里使用了年月日作为版本号, 一旦有新版本上线, 只需要在html script 标签中 (这里考虑js的缓存) 修改版本号即可
 
 
+
+* Memory Cache 和 Disk Cache 区别什么
+  - 均属于浏览器缓存(本地强制缓存), 顾名思义, 前者来自内存后者来自磁盘, 前者速度更快后者保存时间更长
+  - 假设你打开一个页面, 刷新, 打开DevTool的Network, 会发现Size中有很多文件都是Memory Cache，此时关闭窗口后重新开个, 会发现那些文件变成了Disk Cache
+
+
+
 * 聊聊浏览器中关于缓存的问题
-  - 首先, 根据是否向服务端发出请求, 可以将缓存分为强制缓存和对比缓存. 两者可以同时存在, 强制缓存优先级更高.
+  - 首先, 根据是否向服务端发出请求, 可以将缓存分为强制缓存和协商缓存. 两者可以同时存在, 强制缓存优先级更高.
   - 强制缓存值得是浏览器在缓存未失效的情况下, 会忽略请求而直接使用本地的缓存. 相关响应头有Expire 和 Cache-Control. 其中前者兼容HTTP1.0, 而后者是HTTP1.1 提出的新规范
   - Expires的值为服务端返回的到期时间，即下一次请求时，请求时间小于服务端返回的到期时间，直接使用缓存数据, 但是当客户端和服务器端时间存在误差时, 会导致问题.
   - 所以HTTP1.1提出了Cache-Control, 两者可以同时存在, 此时以Cache-Control为准, 这样既保证做主要是为了保证兼容性. Cache-Control 可以用以下取值
@@ -1474,17 +1486,35 @@ function deepCopy2(targetObj) {
     + max-age=xxx:   缓存的内容将在 xxx 秒后失效（相对时间, 解决了客户端服务器端时差问题）
     + no-cache:          需要使用对比缓存来验证缓存数据（后面介绍）
     + no-store:           所有内容都不会缓存，强制缓存，对比缓存都不会触发
-  - 如果当Cache-Control没有触发(过期, 浏览器刷新, 没有设置Cache-Control和Expires), 则应用对比缓存. 相关请求/响应头也有两套
+  - 如果当Cache-Control没有触发(过期, 浏览器刷新, 没有设置Cache-Control和Expires), 则应用协商缓存. 相关请求/响应头也有两套
     + Last-Modified: 服务器在响应请求时，告诉浏览器资源的最后修改时间, 以便浏览器在下一次请求时填入`If-Modified-Since`中
     + If-Modified-Since: 再次请求服务器时，通过此字段通知服务器上次请求时，服务器返回的资源最后修改事件
     + 如果服务器发现资源有变化, 则返回200, 返回新的资源. 否则返回304, 告诉浏览器使用已有缓存即可.
     + Etag / If-None-Match（优先级高于Last-Modified / If-Modified-Since）
     + Etag: 即所谓的资源唯一标识码, 有点类似文件的MD5, 用来判断资源是否发送变化, 以便浏览器在下一次请求时填入`If-None-Match`
-  - 输入URL, 如果是第一次访问, 则获取新的资源并存入缓存, 否则先触发强制缓存再触发对比缓存.
-  - 刷新过程, 忽略强制缓存直接触发对比缓存
+  - 输入URL, 如果是第一次访问, 则获取新的资源并存入缓存, 否则先触发强制缓存再触发协商缓存.
+  - 刷新过程, 忽略强制缓存直接触发协商缓存
   - Ctr + F5 刷新, 清空本地缓存, 强制重新下载
  
   
+* 除了上面提到的缓存技术, 还有吗？
+  - 离线缓存技术, 包括应用缓存manifest和 Service Worker 两种, 前一种已经被标准废弃, 推荐使用第二种, 与上面所提到的缓存不同的是, 上面的缓存是基于请求的, 而这里的缓存是基于整个应用的. 我的猜测是, 首先触发离线缓存, 然后对于需要更新的文件在判断是否触发强制缓存和对比缓存.
+  - 应用程序缓存，是从浏览器的缓存中分出来的一块缓存区，要想在这个缓存中保存数据，可以使用一个描述文件（manifest file），列出要下载和缓存的资源。 只需要在html文件中引用对应的manifest文件即可
+  ```html
+    <!DOCTYPE HTML> 
+    <html manifest="./address-of-manifest"> html content </html>
+  ```
+  - Service Worker基于Web Worker实现, 本质上就是一个特殊的Worker(非JS主线程的其他线程),它可以实现拦截和处理网络请求、消息推送、静默更新、事件同步等服务, 限制条件是页面必须基于HTTPS.(例外是 localhost 和 127.0.0.1 即使HTTP也可以使用)
+  - 如果你使用create-react-app构建Web应用的话, 基于Service Worker的应用离线缓存甚至是的开箱自带的(只需要你把unregister改成register), 然后在正式的生产环境中就会自动生产. 好像是基于WorkBox.
+  - 大概就是监听几个事件
+    + `install`中缓存资源
+    + `active`中清理先前的资源
+    + `fetch`事件中决定要不要拦截请求用然后用缓存作为响应
+    + https://developer.mozilla.org/zh-CN/docs/Web/API/Service_Worker_API/Using_Service_Workers
+
+
+
+
 * 什么是 HTTP method？请罗列出你所知道的所有 HTTP method，并给出解释。
   - get
   - post
