@@ -1,5 +1,5 @@
 ## 前端面试题收录
-* 浏览器渲染过程，回流重绘
+* 浏览器渲染过程，回流重绘 (这个问题随着学习的深入又有了更新的体会, 待更新)
   - https://juejin.im/post/5b2e352ef265da59af409832
   - 渲染过程
     1. url 解析: url -> ip(by dns) -> 建立TCP连接 -> 发送http request -> 收到http request
@@ -1531,7 +1531,7 @@ function deepCopy2(targetObj) {
   - 除上述情况之外, 还需要考虑一点, 资源可能在几天之后更新了. 为了解决这个问题, 这里要考虑两个和缓存有点的头部标识
     + ETag：当前文件的一个验证令牌指纹，用于标识文件的唯一性。
     + Last-Modified：标记当前文件最后被修改的时间。
-  - 在 If-Range 中填入 ETag 或者 Last-Modified 中的任意一个即可, 如果资源没变, 服务器返回206, 断点续传, 否则返回200, 重新下载。
+  - 在 If-Range 中填入 ETag 或者 Last-Modified 中的任意一个即可, 如果资源没变, 服务器返回206, 意思是返回了部分内容, 内容的范围在 Content-Range中, 否则返回200, 重新下载。
   - 但是If-Range 必须配合 Range 来使用, 否则会被服务器忽略.
   - 如果随便输入一个不合理的Range, 例如总长度为1000的数据, 你输入 2000, 就会返回 416, Range Not Satisfiable.
   - https://juejin.im/post/5b555f055188251af25700aa
@@ -1623,16 +1623,23 @@ function deepCopy2(targetObj) {
   - 5xx ：服务器错误，表明服务端在处理请求时发生了错误
   ```
   一些常见的:
-    301 ： Moved Permanently 客户端请求的文档在其他地方，新的URL在location头中给出
-    304 ： Not Modified 客户端有缓存的文档并发出了一个条件性的请求（一般是提供If-Modified-Since头表示客户端只想到指定日期后再更新文档）。服务器告诉客户，原来缓存的文档还可以继续使用。
+    100 : 继续, 表示服务器已经接到了请求的一部分, 正在等待其余部分. 例如某些浏览器的POST请求会先发送HEADER, 收到服务器的100之后再发送data.
+    200 : 请求成功, 一般来自GET/POST请求
+    201 : 成功请求并创建了新的资源
+    206 : 返回了部分内容, 主要用于断点续传
+    301 : Moved Permanently 客户端请求的文档在其他地方，新的URL在location头中给出
+    302 : 临时移动, 资源只是临时移动, 之后应继续使用原有地址
+    304 : Not Modified 客户端有缓存的文档并发出了一个条件性的请求（一般是请求头部中带了If-Modified-Since: XXX 表示客户端想确定是否在这个事件之后内容是否有更新）。服务器告诉客户，原来缓存的文档还可以继续使用。
+
     400 ： Bad Request 请求出现语法错误
     401 ： Unauthorized 访问被拒绝，客户端试图未经授权访问受密码保护的页面
     403 ： Forbidden 资源不可用。服务器理解客户的请求，但拒绝处理它。通常由于服务器文件或目录的权限设置导致。
     404 ： Not Found 无法找到指定位置的资源。
     405 ： Method Not Allowed 请求方法（GET、POST、PUT等）对指定的资源不适用，用来访问本资源的HTTP方法不被允许。
+    416 :  所要求的内容无法满足, 在断点续传中用户请求了超出内容范围的内容
     500 ： Internal Server Error 服务器遇到了意料之外的情况，不能完成客户端的请求。
     502 ： Bad Gateway 服务器作为网管或者代理时收到了无效的响应。
-    503 ： Service Unavailable 服务不可用，服务器由于维护或者负载过中未能应答。
+    503 ： Service Unavailable 服务不可用，服务器由于维护或者负载过重未能应答。
     504 ： Gateway Timeout 网关超时， 作为代理或网关的服务器不能及时的应答。
   ```
 
