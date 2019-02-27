@@ -371,6 +371,9 @@
   - sessionStorage由于只有当前session有效果, 所以通常用来在单页应用中方便各个模块的数据传递
   - 由于localStorage的存储性质, 通常用来存储一些不需要和服务器进行交互的数据, 例如在线编辑文章的自动保存
 
+* 如何实现一个可设置过期时间的localStorage
+  - 没有原生的实现方式, 但是可以考虑自己加一层封装, 存入的时候加上时间戳, 等到获取的时候检测是否过期, 如果过期则删除并返回空.
+
 
 
 * 如何把`document.cookie` 转化为对象
@@ -385,7 +388,7 @@
     return obj
   }
   ```
-    
+
 
 
 * 既然前端可以自由的设置cookie, 会不会不安全? 考虑过`cookie`的安全问题吗?
@@ -1198,6 +1201,22 @@ function deepCopy2(targetObj) {
 ```
 
 
+* 用JavaScript的异步实现sleep函数
+  ```js
+  async function test() {
+    console.log('Hello')
+    await sleep(1000)
+    console.log('world!')
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  test()
+  ```
+
+
 
 * HTTPS 和 HTTP 区别
   - HTTPS 在 HTTP 的基础上, 增加了一层 SSL (secure socket layer), HTTPS 的安全性, 体现在方面 __内容加密__ 以及 __网站真实性认证__(因为HTTP本身是明文传输的, 同时没有任何认证方式)
@@ -1348,8 +1367,8 @@ function deepCopy2(targetObj) {
  
  
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
-  - load 触发比较慢, 需要等DOM以及相关资源全部加载完成之后才触发
-  - 而 DOMContentLoaded 的触发无需等待样式表, 图片等多媒体资源以及iframe等子框架的加载
+  - load 触发比较慢, 需要等DOM以及相关资源全部加载完成之后才触发, 探究发现 可以使用 document.body.onload 或者 window.onload 来绑定, 如果有多个函数, 可以使用 addEventListener('load', listener)
+  - 而 DOMContentLoaded 的触发无需等待样式表, 图片等多媒体资源以及iframe等子框架的加载, 可以使用document.addEventListener来增加监听器
  
  
 * 请解释什么是单页应用 (single page app), 以及如何使其对搜索引擎友好 (SEO-friendly)。
@@ -1573,6 +1592,14 @@ function deepCopy2(targetObj) {
   6.  Closed                                               Closed
   ```
   
+
+
+
+* HTTP能强行使用UDP实现吗?
+  - 可以, 但是可能需要在UDP的基础上考虑进一步封装来确保其可靠性, (UDP默认不可靠)
+  - 例如Google就提出了QUIC协议来实现HTTP over UDP, 通过传输层的多路复用, 类似TCP Fast Open而不是三次握手, 更安全的加密, 纠错而不是重发, 连接复用等方式来保证了其效率.
+  - https://www.zhihu.com/question/29705994
+  - https://zhuanlan.zhihu.com/p/32553477
   
 
 * CDN的基本原理, 有什么优缺点?
@@ -1594,12 +1621,43 @@ function deepCopy2(targetObj) {
 
 
 
+
+* 聊聊协议头中 Connection: Keep-Alive 的作用
+  + 该特征在HTTP/1.1中默认开启, HTTP/1.0中需要主动设置头部.
+  + 目的就是复用TCP连接, 避免客户端与服务器端频繁建立连接而导致的消耗(主要是TCP建立和释放过程中的消耗).
+  + 服务器可以设置例如 Keep-Alive: timeout=5, max=100, 即超时时间以及最大请求数目.
+
+
+
+* 聊聊 HTTP 1.0, HTTP 1.1, HTTP 2.0的区别
+  + 考虑HTTP的更新迭代可以从HTTP的的优化方向的角度着手. 影响其性能的因素主要包括两个: 带宽和延时. 带宽主要靠网络基础设施决定, 所以如果只是考虑协议本身的优化, 可以考虑延时主要来自以下几个方面:
+    1. 浏览器阻塞, 对于同一域名, 浏览器在同一时间存在并行请求数的限制, 即最大连接数.
+    2. DNS查询, 从域名到具体的IP地址可能需要多次查询. 主要解决方式是DNS缓存.
+    3. 建立连接, 由于HTTP基于TCP, TCP的三次握手以及慢启动的特征都会影响到性能.
+
+  + HTTP 1.1和 HTTP 1.0 的区别主要体现在以下几个方面
+    1. 默认Keep-Alive, 即默认复用TCP连接, 减少建立和关闭连接的损耗. 如果客户端或者服务器不想使用长连接, 可以在协议头中加入Connection: close , 而在HTTP/1.0中, 长连接默认是关闭的.
+    2. 支持HOST请求头字段, 优势在于可以让同一个IP以及端口号的主机来使用不同的域名来配置多个站点, 关键就在于用户可以在请求头的HOST字段中加入想要访问的站点.
+    3. 增加了更多用于缓存处理的头字段, 例如使用Cache-control 来替代 Expire设置缓存机制, E-tag类似MD5的比对等等.
+    4. 断点续传: 通过请求头中Range字段来设置需要获取的数据部分, 然后服务器返回状态码206并返回相应部分的资源.
+
+  + 当然在安全性方面引入了HTTPS来改善HTTP明文加密的问题, 具体不表.
+
+  + 实际上在HTTP1.1 到 HTTP2.0的过程中, Google先提出了SPDY方案, 该方案给HTTP2.0提供了参考. 可以认为HTTP/2.0是在SPDY方案的基础上建立的. 其中包括多路复用, 请求优先级设置, 头部压缩, 服务器端推送都被借鉴到了HTTP2.0中. 可以说SPDY是基于HTTP之下但是又在TCP和SSL之上的协议, 可以很轻松的兼容HTTP/1.x.
+
+  + HTTP 2.0, 在完全兼容 HTTP 1.1 的基础上, 极高提高了性能. 主要体现在以下方面
+    1. 多路复用, 允许同时通过单一HTTP/2连接发起多重请求-响应. 而在HTTP/1.1中, 浏览器在同一时间针对同一域名的请求有一定数量限制, 超过限制的部分会被堵塞. 这种多路复用的方式变相的解决的统一域名下请求限额的问题. 也就是说, HTTP/1.1中的连接虽然可以复用, 但前提必须是前一个请求已经完成. 而在HTTP/2中则获得了单个连接中多个请求并行处理的能力, 并行地在同一个TCP连接中双向交换数据. 过去HTTP的性能瓶颈不在于高带宽而在于低延时, 通过并行地高效复用同一个连接, 可以使得HTTP充分享受高带宽带来的优势.同时由于TCP的慢启动机制(起初限制最大连接速度, 一旦数据传输成功, 会逐渐提高传输速度), 所以复用连接通常要好于创建一个新的连接, 因此该协议有助于减少TCP连接数量以及总体的慢启动时间, 进一步提高性能.
+    2. 二进制分帧, 关键之一就是在 应用层(HTTP/2)和传输层(TCP or UDP)之间增加一个二进制分帧层。 传输信息被划分为更小的信息和帧, 并使用二进制编码. HTTP/1.1的头部被封装到HEADER frame中, request body被封装到DATA frame. 由于HTTP/1.x 的解析是基于文本, 文本表现形式有很多种, 改为二进制保证了其健壮性. (具体原因不详)
+    3. 首部压缩, HTTP/2使用的是专门为头部压缩设计的HPACK算法. SPDY则通过DEFLATE压缩算法来进行支持.
+    4. 服务器推送, 服务器可以对客户端的请求返回多个响应. 比如返回HTML的同时返回其所需要的样式表以及脚本文件.
+
+
 * Websocket了解吗
   - webSocket和http一样，同属于应用层协议。它最重要的用途是实现了客户端与服务端之间的全双工通信，当服务端数据变化时，可以第一时间通知到客户端, 如果是http协议, 需要重新建立一个新的请求来发送信息.
   - http只能由客户端发起，而webSocket是双向的
   - webSocket传输的数据包相对于http而言很小，很适合移动端使用
   - 没有同源限制，可以跨域共享资源
-  
+
   
 
 * Long-Polling、Websockets 和 Server-Sent Event 之间有什么区别？
