@@ -1410,17 +1410,17 @@ function deepCopy2(targetObj) {
   
   
 * "attribute" 和 "property" 的区别是什么？
- - attribute是HTML标签上的特性，它的值只能够是字符串, node.attributes是一个类数组对象, property是DOM中的属性，是JavaScript里的对象
- - 如果一个非默认也就是自定义的属性添加的html的某个tag中, 只能通过`node.attributes.属性名`查到
- - 如果对于一个有默认值的属性, 例如 input 标签中的 value, 除非显式修改过, 否则查询node.attributes.value返回undefined, 只有查询node.value才能返回空字符串.
- - property能够从attribute中得到同步, 也就是说attribute更新property会随之更新, 反过来则不行
- - 但是更改property和attribute上的任意值，都会将更新反映到HTML页面中
- ```
-    我的理解是, node.attributes是对于html内容的真实映射, html中node挂了几个标签都会反映到node.attributes中, 例如
-    <input /> 的 node.attributes 是 `NamedNodeMap {length: 0}`
-    而node.属性名 是对DOM标准的实现, 例如input 应该有一个 `value` 的property, 所以不管写不写, input.value 都存在值.
- ```
- - https://www.cnblogs.com/elcarim5efil/p/4698980.html
+  - attribute是HTML标签上的特性，它的值只能够是字符串, node.attributes是一个类数组对象, property是DOM中的属性，是JavaScript里的对象
+  - 如果一个非默认也就是自定义的属性添加的html的某个tag中, 只能通过`node.attributes.属性名`查到
+  - 如果对于一个有默认值的属性, 例如 input 标签中的 value, 除非显式修改过, 否则查询node.attributes.value返回undefined, 只有查询node.value才能返回空字符串.
+  - property能够从attribute中得到同步, 也就是说attribute更新property会随之更新, 反过来则不行
+  - 但是更改property和attribute上的任意值，都会将更新反映到HTML页面中
+  ```
+      我的理解是, node.attributes是对于html内容的真实映射, html中node挂了几个标签都会反映到node.attributes中, 例如
+      <input /> 的 node.attributes 是 `NamedNodeMap {length: 0}`
+      而node.属性名 是对DOM标准的实现, 例如input 应该有一个 `value` 的property, 所以不管写不写, input.value 都存在值.
+  ```
+  - https://www.cnblogs.com/elcarim5efil/p/4698980.html
  
  
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
