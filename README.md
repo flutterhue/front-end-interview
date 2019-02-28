@@ -1710,15 +1710,71 @@ function deepCopy2(targetObj) {
     4. 服务器推送, 服务器可以对客户端的请求返回多个响应. 比如返回HTML的同时返回其所需要的样式表以及脚本文件.
 
 
-* Websocket了解吗
-  - webSocket和http一样，同属于应用层协议。它最重要的用途是实现了客户端与服务端之间的全双工通信，当服务端数据变化时，可以第一时间通知到客户端, 如果是http协议, 需要重新建立一个新的请求来发送信息.
-  - http只能由客户端发起，而webSocket是双向的
-  - webSocket传输的数据包相对于http而言很小，很适合移动端使用
-  - 没有同源限制，可以跨域共享资源
+* WebSocket握手
+  - 相对于HTTP协议, websocket有以下异同: 
+    1. WebSocket和HTTP一样，同属于应用层协议. 其握手过程甚至兼容HTTP协议
+    2. WebSocket是双工的(双向且可以同时发送), HTTP只能由客户端发起.
+    3. WebSocket传输的数据包相对于HTTP而言很小，很适合移动端使用
+    4. WebSocket对于没有同源限制，可以跨域共享资源
+    5. WebSocket是持久化协议, 而HTTP是非持久化, 即Request-Respons之后这次HTTP请求就结束了, 但是 keep-alive 的使用使得这一情况有所改善.
+  - 具体流程 
+    1. 这是一段典型的WebSocket协议的握手请求
+    ```
+    GET /chat HTTP/1.1
+    Host: server.example.com
+    Upgrade: websocket
+    Connection: Upgrade
+    Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+    Sec-WebSocket-Protocol: chat, superchat
+    Sec-WebSocket-Version: 13
+    Origin: http://example.com
+    ```
+    2. 实际上它的大体结构与HTTP请求类似, 关键点在于以下两个字段
+    ```
+    // 这两行告诉服务器切换成WebSocket协议
+    Upgrade: websocket
+    Connection: Upgrade  
+    // 这一行实际只是验证服务器是否真正理解了WebSocket
+    // 这个key和安全无关, 服务器会用固定的算法将该key转化
+    // 最终添加在响应头的 Sec-WebSocket-Accept 字段中
+    Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+    // 要使用的协议和协议版本
+    Sec-WebSocket-Protocol: chat, superchat
+    Sec-WebSocket-Version: 13
+    ```
+    3. 响应头如下
+    ```
+    HTTP/1.1 101 Switching Protocols
+    Upgrade: websocket
+    Connection: Upgrade
+    // 通过 Sec-WebSocket-Key 由固定算法生产, 返回后客户端
+    // 验证其正确性, 最终确定服务器确实支持 WebSocket
+    Sec-WebSocket-Accept: 3NOOJEzyscVfEf0q14gkMrpV20Q=
+    ```
+    4. 如果服务器响应验证通过, 则表示WebSocket握手成功, 可以正式开始通讯.
 
+
+
+* WebSocket 心跳检测
+  + 心跳检测实际上就是一种互相确认当前连接仍然良好的机制. 有时WebSocket碰到网络断开的情况, 如果问题出现在客户端, 浏览器使用`websocket.send`发现数据发不出去, 便会触发`onclose`事件, 但后端并没有收到通知, 这时候可能导致服务器继续想客户端发送数据, 但是这些数据显然会直接丢失.
+  + 为了解决上述问题, 以前端作为主动方，定时发送ping消息，用于检测网络和前后端连接问题。如果后端收到ping类型消息后会立马返回pong类型消息, 如果客户端一段时间没有收到pong, 说明发生异常，前端持续执行重连逻辑，直到重连成功
   
 
 * Long-Polling、Websockets 和 Server-Sent Event 之间有什么区别？
+  + Polling 意思是客户端不断请求服务器端, 同时服务器端无论有无新消息立即返回. 类似厕所内外常常发生的对话. 
+    ```
+    C: 你好了吗?
+    S: 没好
+    C: 快点啊, 我憋不住了
+    S: 就快好了
+    ...
+    ```
+  + Long-Polling/COMET 意思是服务器接收到客户端的请求后, 服务器并不立即回复, 而是阻塞请求直至到有了新的消息是才响应客户端, 而在这期间客户端不在发送任何多余的请求. 如果客户端请求超时, 再客户端重新建立下一次连接的过程中服务器端产生了新数据, 那么服务器端将保存这些数据并等到客户端重新请求连接, 此时服务器端一次性把这些数据返回给客户端.
+  + 不论是 Polling 还是 Long-Polling, 本质都是利用HTTP进行数据通讯(具体实现可以使AJAX或者是基于iframe), Long-Polling的优势在于减少了请求的次数, 因为每次请求的大部分数据(包括头部信息)都是相同的, 减少请求次数有利于提高通讯效率. 同时也缓解了服务器的压力.
+  + WebSocket详见上题
+  + SSE (Server-Sent Event) 即HTML5 提出的一种服务器推送技术, 它允许服务器向客户端实时推送数据. 原理是JS脚本中与服务器之间建立连接, 但是客户端不会关闭连接，而是等待服务端不断得发送响应结果, 服务器可以随时推送新的消息给客户端, 但是它并不能跨域.
+  + 只需要在浏览器中使用 `new EventSource(url)` 创建连接, 并监听其一系列事件例如`open`, `message`, 'close', 'error'等等. 然后服务器端返回头中带上`content-type —— text/event-stream`即可.
+
 
 
 * 请描述以下 request 和 response headers：
@@ -1740,6 +1796,7 @@ function deepCopy2(targetObj) {
   ```
   一些常见的:
     100 : 继续, 表示服务器已经接到了请求的一部分, 正在等待其余部分. 例如某些浏览器的POST请求会先发送HEADER, 收到服务器的100之后再发送data.
+    101 : 协议转换, HTTP/1.1 新加入的. 例如WebSocket建立连接过程中, 服务器第一次响应客户端, 会返回这个状态码.
     200 : 请求成功, 一般来自GET/POST请求
     201 : 成功请求并创建了新的资源
     206 : 返回了部分内容, 主要用于断点续传
