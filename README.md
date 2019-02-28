@@ -839,9 +839,24 @@ EasyPromise.race = function (promises) {
   })
 }
 
-// 中途取消的主要思路还是利用 throw 扔出一个特殊的错误信号
+// 最简单的方式是直接返回一个永远 pending 的Promise
+// 缺陷是内存泄漏
+
+new Promise(r => r(1))
+    .then(val => {
+        console.log('执行到这里不想执行下去')
+        return new Promise(() => {})
+    }).then(val => {
+        console.log('从这里往下面都是不该被执行的代码')
+    })
+
+// 另一个思路是利用 throw 扔出一个特殊的错误信号
 // 下方的错误处理函数接收到此信号后不处理原样跑出
 // 所以需要下放错误函数进行手动处理 比较麻烦
+// 所以可以对这种方式进行封装, 类似的封装思想在于
+// 对于then或者catch外围加一层判断, 如果是特殊信号
+// 则原样抛出
+// https://github.com/xieranmaya/blog/issues/5
 function Break () {}
 new Promise(r => r(1))
     .then(val => {
