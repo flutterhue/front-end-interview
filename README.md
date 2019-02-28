@@ -814,6 +814,48 @@
     
     可以看出，nextTick优先级比promise等microtask高。setTimeout和setInterval优先级比setImmediate高。 这些在浏览器中都不存在
   ```
+
+* 能手动实现 Promise.all 和 Promise.race 吗? Promise 在中途取消有什么思路 ?
+```js
+EasyPromise.all = function (promises) {
+  return new Promise((resolve, reject) => {
+    const result = []
+    let cnt = 0
+    for (let i = 0; i < promises.length; ++i) {
+      promises[i].then(value => {
+        cnt++
+        result[i] = value
+        if (cnt === promises.length) resolve(result)
+      }, reject)
+    }
+  })
+}
+
+EasyPromise.race = function (promises) {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < promises.length; ++i) {
+      promises[i].then(resolve, reject)
+    }
+  })
+}
+
+// 中途取消的主要思路还是利用 throw 扔出一个特殊的错误信号
+// 下方的错误处理函数接收到此信号后不处理原样跑出
+// 所以需要下放错误函数进行手动处理 比较麻烦
+function Break () {}
+new Promise(r => r(1))
+    .then(val => {
+        console.log(2)
+        throw new Break()
+    }).then(val => {
+        console.log(3)
+    }, (reason) => {
+        if (reason instanceof Break) throw reason
+        console.log(reason)
+    }).catch(reason => {
+        console.log('break')
+    })
+```
   
   
 * JavaScript中对象的属性定义与赋值的区别
@@ -1369,6 +1411,7 @@ function deepCopy2(targetObj) {
 * 为何你会使用 `load` 之类的事件 (event)？此事件有缺点吗？你是否知道其他替代品，以及为何使用它们？
   - load 触发比较慢, 需要等DOM以及相关资源全部加载完成之后才触发, 探究发现 可以使用 document.body.onload 或者 window.onload 来绑定, 如果有多个函数, 可以使用 addEventListener('load', listener)
   - 而 DOMContentLoaded 的触发无需等待样式表, 图片等多媒体资源以及iframe等子框架的加载, 可以使用document.addEventListener来增加监听器
+  - 同时实测发现似乎并不存在document.onload, 监听该事件后从来不触发
  
  
 * 请解释什么是单页应用 (single page app), 以及如何使其对搜索引擎友好 (SEO-friendly)。
