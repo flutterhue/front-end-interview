@@ -33,37 +33,37 @@
      ```
      
      
-  * 浏览器修改DOM是同步还是异步
-    + 实际上浏览器对于DOM本身结构的修改是同步的, 但是真实体现在浏览器的表现层面上就是异步的, 也就是说之后会根据同步修改过的DOM去更新web view.
-    + 原因在于浏览器会将DOM的修改暂存在一个队列中, 当前代码执行完成后再集中渲染.
-    + 总的来说就是 DOM树的修改是同步的(js可以立即获取元素)，渲染到屏幕上是异步的(不一定即时看到)
-    + 以下代码渲染结果是都是 0 1 2 3 4 5, 而不是 5 5 5 5 5说明DOM本身修改是同步的, 同时可以立即使用JS获取到class为666的标签
-    ```html
-    <ul>
-    <li id="i0"></li>
-    <li id="i1"></li>
-    <li id="i2"></li>
-    <li id="i3"></li>
-    <li id="i4"></li>
-    </ul>
-    <ul id="newEle"></ul>
+* 浏览器修改DOM是同步还是异步
+  + 实际上浏览器对于DOM本身结构的修改是同步的, 但是真实体现在浏览器的表现层面上就是异步的, 也就是说之后会根据同步修改过的DOM去更新web view.
+  + 原因在于浏览器会将DOM的修改暂存在一个队列中, 当前代码执行完成后再集中渲染.
+  + 总的来说就是 DOM树的修改是同步的(js可以立即获取元素)，渲染到屏幕上是异步的(不一定即时看到)
+  + 以下代码渲染结果是都是 0 1 2 3 4 5, 而不是 5 5 5 5 5说明DOM本身修改是同步的, 同时可以立即使用JS获取到class为666的标签
+  ```html
+  <ul>
+  <li id="i0"></li>
+  <li id="i1"></li>
+  <li id="i2"></li>
+  <li id="i3"></li>
+  <li id="i4"></li>
+  </ul>
+  <ul id="newEle"></ul>
 
-    <script>
-    for(var i = 0;i<5;i++){
-        var item = document.getElementById('i'+i);
-        item.innerHTML = i;
-    }
-    var newEle = document.getElementById('newEle');
-    for(i=0;i<5;i++){
-        var li = document.createElement("li");
-        li.className = "666"
-        li.innerHTML = i;
-        newEle.appendChild(li);
-    }
-    console.log(document.getElementsByClassName('666'))
-    </script>  
-    ```
-    + https://segmentfault.com/a/1190000005803237
+  <script>
+  for(var i = 0;i<5;i++){
+      var item = document.getElementById('i'+i);
+      item.innerHTML = i;
+  }
+  var newEle = document.getElementById('newEle');
+  for(i=0;i<5;i++){
+      var li = document.createElement("li");
+      li.className = "666"
+      li.innerHTML = i;
+      newEle.appendChild(li);
+  }
+  console.log(document.getElementsByClassName('666'))
+  </script>  
+  ```
+  + https://segmentfault.com/a/1190000005803237
 
 
 
@@ -121,11 +121,26 @@
   
 * 你如何对网站的文件和资源进行优化？/ 请说出三种减少页面加载时间的方法。(加载时间指感知的时间或者实际加载时间)
   + CDN (Content Distribution Network)
+  + 域名发散, 域名收敛
   + 尽可能减少http请求次数，将css, js, 图片各自合并 
   + 添加Expire/Cache-Control头
   + 启用Gzip压缩文件
+  + 开启Transfer-Encoding: chunked分段传输, 否则尽量减小html内容.
   + 最小化css, js，减小文件体积
   
+
+
+* 如何检测浏览器白屏事件, 首屏加载时间
+  - 使用performance API 可惜兼容性不强
+  - http://www.alloyteam.com/2016/01/points-about-resource-loading/
+  - 基本思路是在html最开头用JS记录时间, 然后在各个位置例如紧接body之后记录, 这两个事件差值就是白屏事件.
+  - 如果是指全页面内容+图片的话, 可以考虑记录window的load事件发生的事件, 如果仅包括内容的话则记录DOMContentLoaded事件发送的事件. 如果只是用户能到看到的窗口内容不包括图片(首屏加载), 则需要记录窗口最底层dom元素load的时间. 如果是用户能看到的窗口内容加上图片(真·首屏加载), 则需要找到最底部dom元素, 同时该元素以上所有图片的加载时间, 记录最大的那个, 算差值即可.
+  - 另外展开说的话, 总的一条原则就是, 加载是并行的, 执行是串行的.
+    1. 在一条外联JS的前后打上时间戳, 时间差并不等于JS下载的时间, 甚至也不等于下载加执行的事件, 实际上, 如果JS之前有CSS的话, 必须要等到CSS下载完成阻塞结束之后才会执行该条JS(即使JS早已经加载完成). 
+    2. 上一条是在说前一文件的加载阻塞下一文件的执行, 这里要说的是下一文件的加载不会影响到前面文件的执行和加载, 甚至是前面的文件中又动态加载（AJAX）了新的JS文件. 所以无关紧要(与首屏无关的JS)尽量往后放.
+    3. HTML里面Script的加载和执行均会影响 DOMContentLoaded事件的触发. 所以如果body结尾的JS标签阻塞的话, DOMContentLoaded的触发也会阻塞.
+
+
   
 * 浏览器同一时间可以从一个域名下载多少资源？
   + 即使最新的也在8以内, 目的主要是安全以及性能因素
@@ -133,9 +148,12 @@
   + 有利于浏览器复用现有连接 (keep alive技术)
   + 详见 https://www.zhihu.com/question/20474326
   
+   
+
 * 为什么传统上利用多个域名来提供网站资源会更有效？
   - 另一方面某些资源服务器可以避免不必要的Cookie的传递
   - 浏览器对单域名的并行数量有限
+
 
 
 * 什么是viewport, 有什么作用??
@@ -148,6 +166,8 @@
   + 使用以下标签`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">` 可以使得`layout viewport`的大小等于`ideal viewport`, 一般出现在专门对移动端做过适配的页面.
   
   
+
+
 * `window.innerWidth`和 `document.documentElement.clientWidth`的区别
   + ??? https://zhuanlan.zhihu.com/p/37031348
   ```
@@ -159,7 +179,7 @@
 	
 	// 浏览器视窗宽高 不包括滚动条
 	document.documentElement.clientWidth
-	document.documentElement.clientHeight
+	析document.documentElement.clientHeight
 	
 	// 浏览器视窗宽高 包括滚动条
 	window.innerWidth
@@ -200,7 +220,6 @@
   + 不同源的document或者js(例如iframe中的js)想要读取或者操作当前document将受到限制
   + 禁止Ajax发起跨域请求， 实际上请求会发起， 只不过返回响应会被浏览器拦截。
   + Ajax跨域请求不能携带本网站Cookie
-  + 跨域方式
   + 单向跨域: 一般异步获取数据 
     1. JSONP: 利用`<script><img><iframe>`标签默认跨域的特征, 所以该方式只支持get方法
       与服务器约定好， 让服务器返回一个`script`并在其中回调页面中的函数， 页面所需的数据作为调用参数
@@ -355,6 +374,19 @@
 
 
   
+* 什么是域名收敛, 有什么好处
+  1. 域名发散
+    - PC时代为了突破浏览器域名并发的限制, 会尽力让网站的静态资源分布在多个子域名以充分利用浏览器的并发下载能力
+    - 深层原因就是以前服务器负载均衡能力差, 流量稍微大一点服务器就容易崩溃, 这样做保证了服务器的稳定性.
+    - 同时防止黑客利用浏览器发起DDOS攻击
+  2. 域名收敛
+    - 在移动端时代, 由于网络质量参差不齐, 域名解析在整个HTTP请求中耗时占了很大一部分比重. 将域名集中以减少域名解析(DNS)的成本. 这与PC端网络稳定解析迅速存在差异
+    - 不考虑缓存的情况下, DNS解析的过程大概是一个迭代的过程. 例如对于 www.example.com, 首先解析的顶级域 `com` , 实际上顶级域包括通用顶级域`com, org, net`和国家地区顶级域`co.uk, cn, hk, tw`等等. 顶级域的根节点服务器通常在国外. 然后根节点服务器告诉我们下一节点的位置, 然后再是用同样的规则解析一级域名`example`.
+  3. 所以所谓的优势劣势都是因地适宜, 最佳实践需要通过不同情况进行调整.
+
+
+
+
 * 请描述 `cookies`、`sessionStorage` 和 `localStorage` 的区别。
   - 都是同源的, 同时都保存在客户端
   - 可储存大小
@@ -613,6 +645,36 @@
 		}
 	  </style>
   ```
+
+
+
+
+* JS作用域链
+  - 作用域的顶端肯定是全局作用域, 例如浏览器环境中的window即在全局作用域.
+  -  作用域链的具体表现可以看做是一个栈, 全局作用域在栈底部
+  - 然后每次函数创建的时候, 引擎会在函数内部挂上一个内部属性, 该属性将保存父环境的作用域链.
+  - 每次函数执行过程中, 首先浅拷贝内部属性创建作用域链(注意浅拷贝复制, 也就是说如果重复调用, 属于父环境中的变量是会有影响的), 然后扫描函数内的所有形参, 函数, 变量声明创建新的作用域放在链顶(这里是创建, 也就是对于自身的作用域, 每次都是新的). 如果遇到变量, 则从顶部开始查找, 直至找到位于底部的全局作用域.
+  ```js
+  function pf () {
+    let pv = 1
+    return function ps() {
+      pv++
+      console.log(pv)
+    }
+  }
+  let ps = pf()
+  ps() // 2
+  ps() // 3
+  ps() // 4
+
+  ps = pf()
+  ps() // 2
+
+  // 以上例子充分说明了我提到的最后一点, 就是函数的执行每次都会创建新的上下文, 但是对于它的上方作用域链, 实际上只是浅拷贝.
+  ```
+  
+
+
 
   
   
@@ -1316,7 +1378,7 @@ function deepCopy2(targetObj) {
   
   
 * 请解释 `Function.prototype.bind`？
-  ```
+  ```js
   // 对普通函数
   function kk (a, b, c) { console.log(this, a, b, c) }
   var jj = kk.bind({}, 1, 2)
@@ -1335,7 +1397,7 @@ function deepCopy2(targetObj) {
   
   
 * 能否写一个bind函数的polyfill
-  ```
+  ```js
     function bindPolyfill (fn, context, ...args) {
         return function (...args2) {    
             fn.apply(context, args.concat(args2))
@@ -1698,6 +1760,7 @@ function deepCopy2(targetObj) {
     2. 支持HOST请求头字段, 优势在于可以让同一个IP以及端口号的主机来使用不同的域名来配置多个站点, 关键就在于用户可以在请求头的HOST字段中加入想要访问的站点.
     3. 增加了更多用于缓存处理的头字段, 例如使用Cache-control 来替代 Expire设置缓存机制, E-tag类似MD5的比对等等.
     4. 断点续传: 通过请求头中Range字段来设置需要获取的数据部分, 然后服务器返回状态码206并返回相应部分的资源.
+    5. 支持分块传输: Transfer-Encoding: chunked. HTTP/1.0时代的数据总是整个发送, 所以Content-Length必须提前知道才能区分当前应答的结束和后续应答的开始(否则浏览器一直处于pending状态). 而分块之后则不需要, 这种方式允许HTTP一边压缩一边发送, 而不是整块压缩得到数据大小后在发送, 最后以一个没有内容的分块作为结束. 同时在一些极端情况下, 要计算HTTP某段内容的散列值并记录在头字段中, 完整发送的话只能讲整个HTTP内容全部缓冲之后才能计算发送, 而分段发送允许头字段最后发送, 可以在其他部分发送完毕的情况下填入该散列值最后发送头字段.
 
   + 当然在安全性方面引入了HTTPS来改善HTTP明文加密的问题, 具体不表.
 
