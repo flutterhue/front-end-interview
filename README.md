@@ -422,6 +422,22 @@
   ```
 
 
+* 用JS如何设置/删除 cookie 
+  1. 设置cookie并不是单单由名字来唯一确定的, 而是通过名字, 域名以及路径, 删除原理是将cookie过期时间设置为过去. 例如以下三个语句会在Google搜索页面设置三个同名但不同cookie.
+     1. document.cookie = "name=12; path=/search;"
+     2. document.cookie = "name=12; domain=.google.co.uk;"
+     3. document.cookie = "name=12; "
+   
+  2. 对于删除有几个要注意的 
+     1. 不能删除domain非当前域名的cookie
+     2. 对于domain是`当前域名`的, 删除时不能设置domain (例如https://segmentfault.com/中的sf_remember)
+     3. 对于domain是`.当前域名`, 删除时候必须带上domain职为domain或者.domain(例如`_ga`)
+  3. 设置cookie过程中对于没有设置的值会用默认值覆盖, 即使之前它有自己的值
+  4. 例如`document.cookie = "_ga=; expires=" + new Date(0).toGMTString() + "; max-age=0;  domain=segmentfault.com; path=/"`
+  5. https://stackoverflow.com/questions/179355/clearing-all-cookies-with-javascript
+  6. https://stackoverflow.com/questions/5688491/unable-to-delete-cookie-from-javascript
+
+
 
 * 既然前端可以自由的设置cookie, 会不会不安全? 考虑过`cookie`的安全问题吗?
   + 服务器端返回cookie时, 对于某些敏感的cookie设置httpOnly为true, 这种cookie是无法通过document.cookie拿到的, 所以也就无法修改. 同时只会在发送请求的时候被附带, 使用脚本AJAX时由于无法获取, 所以也不会被带上.
@@ -1334,6 +1350,45 @@ function deepCopy2(targetObj) {
 
   test()
   ```
+
+
+
+* AJAX 的实现
+  ```js
+  var getXmlHttpRequest = function () {
+      if (window.XMLHttpRequest) {
+          //主流浏览器提供了XMLHttpRequest对象
+          return new XMLHttpRequest();
+      }
+      else if (window.ActiveXObject) {
+          //低版本的IE浏览器没有提供XMLHttpRequest对象
+          //所以必须使用IE浏览器的特定实现ActiveXObject
+          return new ActiveXObject("Microsoft.XMLHTTP");
+      }
+  };
+
+  // 绑定监听事件
+  var xhr = getXmlHttpRequest();
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+          //获取成功后执行操作
+          //数据在xhr.responseText
+      }
+  };
+  xhr.open("content-type", "server-url", true);
+  xhr.send("content"); 
+  /*
+    // xhr.readyState状态的含义
+    0: 未初始化状态：此时，已经创建了一个XMLHttpRequest对象
+    1: 准备发送状态：此时，已经调用了XMLHttpRequest对象的open方法，并且XMLHttpRequest对象已经准备好将一个请求发送到服务器端
+    2: 已经发送状态：此时，已经通过send方法把一个请求发送到服务器端，但是还没有收到一个响应
+    3: 正在接收状态：此时，已经接收到HTTP响应头部信息，但是消息体部分还没有完全接收到
+    4: 完成响应状态：此时，已经完成了HTTP响应的接收
+
+    // xhr.status 是服务器状态码 服务器发送错误时会返回5xx
+  */
+  ```
+
 
 
 
