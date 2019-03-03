@@ -442,6 +442,17 @@
 
 
 * Webpack 热更新HMR的原理
+  - Webpack 热更新需要配合 webpack-dev-server 或者 webpack-hot-middleware 来实现.
+  - 以webpack-dev-server为例:
+    1. 首先对于webpack本身而言, 处于监听模式下他会对文件的变化重新打包, 并将事件通知给感兴趣的监听函数
+    2. 然后对于webpack-dev-server, 其中间件 webpack-dev-middleware 就是所谓的监听函数, 它将webpack重新打包的代码储存在内存中.
+    3. 另外实际上webpack-dev-server与客户端之间实际是有连接的(WebSocket长连接), 检测到变化之后他将通知webpack-dev-server的客户端模块, 此时只是通知, 具体内容仅仅是一个包含新模块的哈希, 方便之后HotModuleReplaceRuntime通过该哈希获取对应跟新的模块.
+    4. 客户端模块的作用并不是跟新模块, 而是通知webpack本身, 然后webpack自身的HotModuleReplaceRuntime会负责具体的模块更新问题. 它通过AJAX向webpack-dev-server发出请求, 然后webpack-dev-server通过JSONP的方式返回更新模块的具体内容.
+    5. 如果过程失败将导致live reload 也就是刷新操作.
+  - 通过上述过程可以看出, 实际上webpack-dev-server在整个热模块替换过程中起到的只是一个两段之间信息传递的作用, 他实际上并不参与具体的模块传输及更新. 这就是为什么 webpack-hot-middleware 也能完成这个工作, 只不过它基于EventSource而不是WebSocket.
+  - 另一方面, HMR它实际上是可选功能, 如一个模块并没有在module.hot中定义模块更新之后的具体行为(没有HMR处理函数), 它将向依赖树的上层冒泡, 直至找到处理函数, 否则将自动刷新页面. 这也是为什么你用style-loader不需要任何配置就能自动热更新, 因为它内部实现已经包含了HMR处理函数, 而自己写的只有一行的`console.log(1)`改为`console.log(2)`时却会导致页面刷新. 你需要加入`module.hot.accept(errorHandler);`来进行模块自更新.
+  - https://webpack.docschina.org/api/hot-module-replacement
+  - https://zhuanlan.zhihu.com/p/30669007
 
 
 * 用JS如何设置/删除 cookie 
