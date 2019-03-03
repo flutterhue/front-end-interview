@@ -422,6 +422,28 @@
   ```
 
 
+
+* React 中 setState 是异步吗 ？
+  - 实际上分情况, 有可能同步有可能异步, 生命周期函数中(例如componentDidMount)中以及合成事件中是异步的, 而在原生事件或者setTimeout中是同步的.
+  - 而batchingStrategy中的 isBatchingUpdates用来控制是立即更新还是之后更新, 在生命周期函数以及合成事件中, 这些钩子被调用的时候的 isBatchingUpdates 都是 true, 这导致了此时调用的多次setStates结果被放进了dirtyComponents的列表中, 所以会出现连续两次`setState({count: this.state.count+1})`, count是加1的现象. 因为在dirtyComponents会在下一次更新前把所有的partialState合并, 由于此时前后两次this.state.count 的值都相同, 所以效果相当于1次.
+  - 然而在原生或者setTimeout中, 此时的isBatchingUpdates已经是false, 所以setState相当于是执行了同步代码, 并不会采用批处理的方式.
+  - 这个问题的关键在于React中一个概念叫Transaction, 它的作用是给任何方法套上两个wrapper, 每个wrapper对象都有initialize和close方法, 而对于`ReactDefaultBatchingStrategyTransaction`中的wrapper 的作用主要是在交易结束后将isBatchingUpdates设为false, 然后调用`flushBatchedUpdates`批量处理沉积的DirtyComponents.
+  - https://github.com/MrErHu/blog/issues/20
+  - https://undefinedblog.com/what-happened-after-set-state/
+  - http://undefinedblog.com/understand-react-batch-update/
+  - https://zhuanlan.zhihu.com/p/39512941
+
+
+
+* Webpack 打包的原理
+  - https://www.jianshu.com/p/e8ec61954748
+  - https://zhuanlan.zhihu.com/p/37864523
+  - https://juejin.im/post/5badd0c5e51d450e4437f07a
+
+
+* Webpack 热更新HMR的原理
+
+
 * 用JS如何设置/删除 cookie 
   1. 设置cookie并不是单单由名字来唯一确定的, 而是通过名字, 域名以及路径, 删除原理是将cookie过期时间设置为过去. 例如以下三个语句会在Google搜索页面设置三个同名但不同cookie.
      1. document.cookie = "name=12; path=/search;"
@@ -1920,6 +1942,7 @@ function deepCopy2(targetObj) {
     206 : 返回了部分内容, 主要用于断点续传
     301 : Moved Permanently 客户端请求的文档在其他地方，新的URL在location头中给出
     302 : 临时移动, 资源只是临时移动, 之后应继续使用原有地址
+    303 : See Other, 要求客户端使用POST请求另一个URI. 通常出现在脚本POST/DELETE/PUT请求后. 有时可以与302混用.
     304 : Not Modified 客户端有缓存的文档并发出了一个条件性的请求（一般是请求头部中带了If-Modified-Since: XXX 表示客户端想确定是否在这个事件之后内容是否有更新）。服务器告诉客户，原来缓存的文档还可以继续使用。
 
     400 ： Bad Request 请求出现语法错误
