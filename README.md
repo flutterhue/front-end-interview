@@ -436,6 +436,7 @@
 
 
 * Webpack 打包的原理
+  - Webpack实际上原理很简单, 如果不考虑Chunks的话, 最终所有文件打包进同一文件, Webpack从入口文件开始分析依赖, 其中可能包括你import的其他js, css, 甚至图片. 每个类型的资源都会被当成模块, 经过相应的loader只有最终均被转化为合法的js代码. 然后最终的打包文件是一个IIFE, 其传入参数就是对象, 该对象的key是文件名value是由对应文件内的js代码构成的函数. 该对象被传入后, 函数体中定义了一个对象叫做installedModules对象用来缓存已经被加载的对象. 并定义了工具函数__webpack_require__来加载模块. 然后从入口函数开始, 一旦遇到新模块, 直接调用webpack_require进行加载 (如果已经缓存则直接返回).
   - https://www.jianshu.com/p/e8ec61954748
   - https://zhuanlan.zhihu.com/p/37864523
   - https://juejin.im/post/5badd0c5e51d450e4437f07a
