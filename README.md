@@ -437,9 +437,20 @@
 
 * Webpack 打包的原理
   - Webpack实际上原理很简单, 如果不考虑Chunks的话, 最终所有文件打包进同一文件, Webpack从入口文件开始分析依赖, 其中可能包括你import的其他js, css, 甚至图片. 每个类型的资源都会被当成模块, 经过相应的loader只有最终均被转化为合法的js代码. 然后最终的打包文件是一个IIFE, 其传入参数就是对象, 该对象的key是文件名value是由对应文件内的js代码构成的函数. 该对象被传入后, 函数体中定义了一个对象叫做installedModules对象用来缓存已经被加载的对象. 并定义了工具函数__webpack_require__来加载模块. 然后从入口函数开始, 一旦遇到新模块, 直接调用webpack_require进行加载 (如果已经缓存则直接返回).
+  - 另外, 传入的对象中key对于的value是一个JS代码构成的函数. 更具体将, 是一个用eval包裹的函数, 而源代码则在eval包裹的字符串中. 用eval包裹的原因似乎是为了缓存SourceMap进而提高构建速度.
   - https://www.jianshu.com/p/e8ec61954748
   - https://zhuanlan.zhihu.com/p/37864523
   - https://juejin.im/post/5badd0c5e51d450e4437f07a
+
+
+* Webpack 中Chunk的优势
+  - 通俗来讲Chunk就是把最终打包成的单一JS文件分离出多个JS. 主要目的还是优化异步加载, 也即是说客户端可以按需加载代码恶如不是一口气加载所有的代码.
+  - 合理使用的情况下可以优化页面加载时间.
+
+* Tree shaking 的概念
+  - 通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。它依赖于 ES2015 模块系统中的静态结构特性，例如 import 和 export
+  - 传统的DCE(dead code elimination)是不一样的, 主要是`代码不可到达`, `代码结果未被使用`, `变量只写不读`的三类代码消除. 传统编译型语言中由编译器完成, JS中由uglify工具完成.
+  - 而ES6模块系统是静态分析的, 也就是说在预处理阶段就可以判断到底加载了哪些代码, TreeShaking就是通过这种方式减少不必要代码的引入, 再引入过程中只考虑实际要使用的那部分代码. 例如`import { functionA } from lib.js`, 假设functionB和functionA没有互相依赖关系但都是lib.js的导出函数, 那么在这种情况有tree shaking 的话只会引入functionA. 结合上面Webpack打包原理来看就是传入对象中于key`lib.js`对于的value只有`eval('function functionA() {...}')`
 
 
 * Webpack 热更新HMR的原理
