@@ -752,6 +752,8 @@
 * 请解释浏览器是如何判断元素是否匹配某个 CSS 选择器？
     1. CSS选择器的解析是从右向左解析的。若从左向右的匹配，通常是到后面才发现不符合规则，需要进行回溯，会损失很多性能。
     2. 若从右向左匹配，先找到所有的最右节点，一旦发现匹配失败则可以直接返回, 避免了许多无效匹配。
+    3. https://www.zhihu.com/question/20185756/answer/14263713
+    4. https://stackoverflow.com/questions/5797014/why-do-browsers-match-css-selectors-from-right-to-left/5813672
   
     
     
