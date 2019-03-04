@@ -476,12 +476,12 @@
 
 
 * Webpack 中Chunk的优势
-  - 通俗来讲Chunk就是把最终打包成的单一JS文件分离出多个JS. 主要目的还是优化异步加载, 也即是说客户端可以按需加载代码恶如不是一口气加载所有的代码.
+  - 通俗来讲Chunk就是把最终打包成的单一JS文件分离出多个JS. 主要目的还是优化异步加载, 也即是说客户端可以按需加载代码而不是一口气加载所有的代码.
   - 合理使用的情况下可以优化页面加载时间.
 
 * Tree shaking 的概念
   - 通常用于描述移除 JavaScript 上下文中的未引用代码(dead-code)。它依赖于 ES2015 模块系统中的静态结构特性，例如 import 和 export
-  - 传统的DCE(dead code elimination)是不一样的, 主要是`代码不可到达`, `代码结果未被使用`, `变量只写不读`的三类代码消除. 传统编译型语言中由编译器完成, JS中由uglify工具完成.
+  - 传统的DCE(dead code elimination)是主要是`代码不可到达`, `代码结果未被使用`, `变量只写不读`的三类代码消除. 传统编译型语言中由编译器完成, JS中由uglify工具完成.
   - 而ES6模块系统是静态分析的, 也就是说在预处理阶段就可以判断到底加载了哪些代码, TreeShaking就是通过这种方式减少不必要代码的引入, 再引入过程中只考虑实际要使用的那部分代码. 例如`import { functionA } from lib.js`, 假设functionB和functionA没有互相依赖关系但都是lib.js的导出函数, 那么在这种情况有tree shaking 的话只会引入functionA. 结合上面Webpack打包原理来看就是传入对象中于key`lib.js`对于的value只有`eval('function functionA() {...}')`
 
 
@@ -491,7 +491,7 @@
     1. 首先对于webpack本身而言, 处于监听模式下他会对文件的变化重新打包, 并将事件通知给感兴趣的监听函数
     2. 然后对于webpack-dev-server, 其中间件 webpack-dev-middleware 就是所谓的监听函数, 它将webpack重新打包的代码储存在内存中.
     3. 另外实际上webpack-dev-server与客户端之间实际是有连接的(WebSocket长连接), 检测到变化之后他将通知webpack-dev-server的客户端模块, 此时只是通知, 具体内容仅仅是一个包含新模块的哈希, 方便之后HotModuleReplaceRuntime通过该哈希获取对应跟新的模块.
-    4. 客户端模块的作用并不是跟新模块, 而是通知webpack本身, 然后webpack自身的HotModuleReplaceRuntime会负责具体的模块更新问题. 它通过AJAX向webpack-dev-server发出请求, 然后webpack-dev-server通过JSONP的方式返回更新模块的具体内容.
+    4. 客户端模块的作用并不是更新模块, 而是通知webpack本身, 然后webpack自身的HotModuleReplaceRuntime会负责具体的模块更新问题. 它通过AJAX向webpack-dev-server发出请求, 然后webpack-dev-server通过JSONP的方式返回更新模块的具体内容.
     5. 如果过程失败将导致live reload 也就是刷新操作.
   - 通过上述过程可以看出, 实际上webpack-dev-server在整个热模块替换过程中起到的只是一个两段之间信息传递的作用, 他实际上并不参与具体的模块传输及更新. 这就是为什么 webpack-hot-middleware 也能完成这个工作, 只不过它基于EventSource而不是WebSocket.
   - 另一方面, HMR它实际上是可选功能, 如一个模块并没有在module.hot中定义模块更新之后的具体行为(没有HMR处理函数), 它将向依赖树的上层冒泡, 直至找到处理函数, 否则将自动刷新页面. 这也是为什么你用style-loader不需要任何配置就能自动热更新, 因为它内部实现已经包含了HMR处理函数, 而自己写的只有一行的`console.log(1)`改为`console.log(2)`时却会导致页面刷新. 你需要加入`module.hot.accept(errorHandler);`来进行模块自更新.
