@@ -2069,6 +2069,82 @@ foo.x = foo = { n: 2 };
 // { n: 1, x: { n: 2 } }
 ```
 
+* 实现一个LazyMan，可以按照以下方式调用:
+```
+LazyMan("Hank")输出:
+Hi! This is Hank!
+ 
+LazyMan("Hank").sleep(10).eat("dinner")输出
+Hi! This is Hank!
+//等待10秒..
+Wake up after 10
+Eat dinner~
+ 
+LazyMan("Hank").eat("dinner").eat("supper")输出
+Hi This is Hank!
+Eat dinner~
+Eat supper~
+ 
+LazyMan("Hank").sleepFirst(5).eat("supper")输出
+//等待5秒
+Wake up after 5
+Hi This is Hank!
+Eat supper
+ 
+以此类推。
+```
+```js
+function LazyMan(name) {
+	let hasInit = false
+    let tasks1 = []
+    let tasks2 = []
+	function next () {
+		if (tasks1.length !== 0) {
+			tasks1.shift()()
+        } else {
+			if (!hasInit) {
+    			console.log(`Hi This is ${name}!`)
+				hasInit = true
+            }
+			if (tasks2.length !== 0) {
+				tasks2.shift()()
+            }
+        }
+    }
+
+	let man = {
+		sleepFirst: function (second) {
+			tasks1.push(() => {
+                setTimeout(() => {
+                    console.log(`Wake up after ${second}`)
+                    next()
+                }, second * 1000)
+            })
+			return this
+        },
+
+		sleep: function (second) {
+			tasks2.push(() => {
+				setTimeout(() => {
+					console.log(`Wake up after ${second}`)
+					next()
+				}, second * 1000)
+            })
+			return this
+        },
+		eat: function (kind) {
+			tasks2.push(() => {
+				console.log(`eat ${kind}`)
+				next()
+			})
+			return this
+		}
+	}
+	setTimeout(next)
+	return man
+}
+```
+
 * 关于树的节点数, 度, 叶子节点的关系
   - 首先, 树中度指的是该节点子节点的数量, 叶节点度为0
   - 由于除根节点外每个节点都是由父节点指向的, 所以 树的节点数 = 所有节点的度数 + 1
