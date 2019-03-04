@@ -239,34 +239,34 @@
       1. 在跨域服务器中的响应头部中加入`Access-Control-Allow-Origin`表示服务器允许哪些域可以访问该资源
       2. Access-Control-Allow-Origin: <origin> | *
       3.包括该字段之外， 还有`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Max-Age` 等等字段配合达到更强大的效果
-    3. 反向代理服务器, 即将自己的服务器进行配置, 然后由服务器请求数据后返回给页面.
+    3. 代理服务器, 即将自己的服务器进行配置, 然后由服务器请求数据后返回给页面.
   + 双向跨域: 主要用于多窗口间的信息互相传递
-    1. `使用document.doomain`, 但限制在于创体检的基础域名必须相同.
+    1. `使用document.domain`, 但限制在于两窗口的基础域名必须相同 (父子域或者是兄弟域). 然后分别为在两页面的脚本中设置域名为相同域名(基础域名), 一旦设置完成即可跨域.
       ```html
-      // 该页面本身为 http://www.domain.cn/A.html
+      // ------------------- http://domain.cn/A.html -----------------------
       <iframe id="iframe" src="http://domain.cn/B.html" onload="test()">
       </iframe>
       <script type="text/javascript">
         document.domain = 'domain.cn';//设置成主域
         function test(){
           // contentWindow 可取得子窗口的 window 对象
-          // 如果跨域成功 window 对象中会有更多属性 如用来操作子窗口
-          // 内容的document等等较为敏感的属性才能获取到
+          // 一旦设置完成后, window 对象中会有更多属性 
+          // 例如用来操作子窗口内容的document等等较为敏感的属性
           alert(document.getElementById('￼iframe').contentWindow)
         }
       </script> 
+      // ------------------- http://domain.cn/B.html -----------------------
       <script type="text/javascript">
           //在iframe载入这个页面也设置document.domain, 两者域名必须一致
           document.domain = 'domain.cn'
       </script>
       ```
-    2. `location.hash`能够实现完全不同源的页面之间的相互通信, 主要原理就是利用`iframe`窗体可以设置父窗体的location.hash来实现. 例如
+    2. `location.hash`能够实现完全跨域, 主要原理就是利用`iframe`窗体可以设置父窗体的location.hash来实现. 也就是说来自跨域的服务器可以通弄过页面B中的 parent.location.hash 来向A页面发送信息.
     ```html
-      // 该页面本身为 http://www.domain1.cn/index.html
-      <iframe id="iframe" src="http://domain2.cn/index.html" onload="test()">
-      </iframe>
+      // ------------------- http://domain1.cn/index.html -----------------------
+      <iframe id="iframe" src="http://domain2.cn/index.html" > </iframe>
 
-      // 该页面本身为 http://www.domain2.cn/index.html
+      // ------------------- http://domain2.cn/index.html -----------------------
       <script>
         parent.location.hash = "wangbadan"
       </script>
@@ -274,10 +274,10 @@
       // 页面成功加载后可以发现 `domain1.cn/index.html`的地址变成了
       // http://www.domain1.cn/index.html#wangbadan
     ```
-    3. `window.name`也能实现完全不同源页面之间通信, 利用的是同一个窗口的`window.name`即使载入新的网址也不发生变化这个特征, 支持的name值最长可以为2M.
+    3. `window.name`也能实现完全跨域, 利用的是同一个窗口的`window.name`即使载入新的网址也不发生变化这个特征, 支持的name值最长可以为2M.
     ```html
-    // 该html地址是 http://127.0.0.1:8080/index.html (异源父页面)
-    <iframe id="if1" src="http://127.0.0.1:8081/index.html"></iframe>
+    // ------------ http://127.0.0.1:8080/index.html ------------
+    <iframe id="if1" src="http://127.0.0.1:6666/index.html"></iframe>
     <script type="text/JavaScript">
       setTimeout(() => {
           // 必须确保iframe页面已经加载好, 也就是数据已经被存入子窗口的 window.name
@@ -292,11 +292,11 @@
           // 由于此时是同源窗口, 作为父窗口可以设置子窗口的window.name
           document.getElementById('if1').contentWindow.name = '来自父窗口的回复'
           // 把地址改为异源, 通过window.name 传回数据
-          document.getElementById('if1').src = 'http://127.0.0.1:8081/index.html'
+          document.getElementById('if1').src = 'http://127.0.0.1:6666/index.html'
       }, 2000);
     </script>
 
-    // 该html地址是 http://127.0.0.1:8081/index.html (异源子页面)
+    // ------------ http://127.0.0.1:6666/index.html ------------
     <script>
       if (window.name === '') {
         // 第一次访问，填入数据
@@ -309,19 +309,21 @@
     ```
     4. 使用HTML5全新API `window.postMessage` 进行跨域
     ```html
-    // 该html地址是 http://127.0.0.1:8080/index.html (异源父页面)
-    <iframe id="if1" src="http://127.0.0.1:8081/index.html"></iframe>
+    // ------------ http://127.0.0.1:8080/index.html ------------
+    <iframe id="if1" src="http://127.0.0.1:5555/index.html"></iframe>
     <script type="text/JavaScript">
     setTimeout(() => {
       // 向子窗口发送信息
       document.getElementById('if1')
         .contentWindow
-        .postMessage('父亲: 吃了吗', 'http://127.0.0.1:8081')
+        .postMessage('父亲: 吃了吗', 'http://127.0.0.1:5555')
 
       // 向自己发送信息 postMessage是异步的, 所以可以写在监听事件绑定的前面
       // 第二个参数 * 表示发送给任意地址的窗口, 但是感觉this已经控制了发送
       // 的指向, 不知道这个参数还有什么作用
-      window.postMessage('???', '*')
+
+      // 解答: 假设当前窗口被重定向到了另一地址, 如果不加限制可能会有安全问题.
+      window.postMessage(msg, url)
 
       // 准备接受信息
       window.onmessage = e => {
@@ -330,7 +332,7 @@
     }, 1000)
     </script>
 
-    // 该html地址是 http://127.0.0.1:8081/index.html (异源子页面)
+    // --------------- http://127.0.0.1:5555/index.html ---------------
     <script>
       window.onmessage = e => {
         console.log(e)
@@ -340,8 +342,6 @@
         // e.origin 是发送来源的地址 也即是 http://127.0.0.1:8080
       }
     </script>
-
-
     ```
   
   
@@ -381,7 +381,7 @@
     - 同时防止黑客利用浏览器发起DDOS攻击
   2. 域名收敛
     - 在移动端时代, 由于网络质量参差不齐, 域名解析在整个HTTP请求中耗时占了很大一部分比重. 将域名集中以减少域名解析(DNS)的成本. 这与PC端网络稳定解析迅速存在差异
-    - 不考虑缓存的情况下, DNS解析的过程大概是一个迭代的过程. 例如对于 www.example.com, 首先解析的顶级域 `com` , 实际上顶级域包括通用顶级域`com, org, net`和国家地区顶级域`co.uk, cn, hk, tw`等等. 顶级域的根节点服务器通常在国外. 然后根节点服务器告诉我们下一节点的位置, 然后再是用同样的规则解析一级域名`example`.
+    - 不考虑缓存的情况下, DNS解析的过程大概是一个迭代的过程. 例如对于 www.example.com, 首先解析的顶级域 `com` , 实际上顶级域包括通用顶级域`com, org, net`和国家地区顶级域`co.uk, cn, hk, tw`等等. 顶级域的根节点服务器通常在国外. 然后根节点服务器告诉我们下一节点的位置, 然后再是用同样的规则解析一级域名`example`, 这样递归解析过程在移动端应该尽量避免.
   3. 所以所谓的优势劣势都是因地适宜, 最佳实践需要通过不同情况进行调整.
 
 
@@ -420,6 +420,38 @@
     return obj
   }
   ```
+
+
+* 用JS如何设置/删除 cookie 
+  1. 设置cookie并不是单单由名字来唯一确定的, 而是通过名字, 域名以及路径, 删除原理是将cookie过期时间设置为过去. 例如以下三个语句会在Google搜索页面设置三个同名但不同cookie.
+     1. document.cookie = "name=12; path=/search;"
+     2. document.cookie = "name=12; domain=.google.co.uk;"
+     3. document.cookie = "name=12; "
+  2. 设置cookie过程中对于没有设置的值会用默认值覆盖, 即使之前它有自己的值
+  3. 对于删除有几个要注意的 
+     1. 不能删除domain非当前域名的cookie
+     2. 对于domain是`当前域名`的, 删除时不能设置domain (例如https://segmentfault.com/中的sf_remember)
+     3. 对于domain是`.当前域名`, 删除时候必须带上domain职为domain或者.domain(例如https://segmentfault.com/中的`_ga`)
+  4. 这是一条用来删除cookie的命令`document.cookie = "_ga=; expires=" + new Date(0).toGMTString() + "; max-age=0;  domain=segmentfault.com; path=/"`
+  5. https://stackoverflow.com/questions/179355/clearing-all-cookies-with-javascript
+  6. https://stackoverflow.com/questions/5688491/unable-to-delete-cookie-from-javascript
+
+
+
+* 既然前端可以自由的设置cookie, 会不会不安全? 考虑过`cookie`的安全问题吗?
+  + 服务器端返回cookie时, 对于某些敏感的cookie设置httpOnly为true, 这种cookie是无法通过document.cookie拿到的, 所以也就无法修改. 同时只会在发送请求的时候被附带, 使用脚本AJAX时由于无法获取, 所以也不会被带上.
+  + 尽可能地设置有效期较短的cookie， 也就是增加expires/max-age (前者是HTTP1.0中的表示绝对时间后者是1.1新规范表示相对时间, 一般为保证兼容性都写), 或者干脆不写或者写一个早于当前时间的日期, 这样的话cookie将会随着Session一起过期
+  + 给cookie添加secure: true, 表示只在https协议下传输.
+  + 给敏感的cookie加密或者哈希
+  + https://zhuanlan.zhihu.com/p/36197012
+
+
+
+    
+* 除了上面提到的三种, 还有吗? 
+  - 前端数据库, 相比sessionStorage/localStorage, 可存储的容量更大, 主要包含以下两种
+    - Web SQL, W3似乎已经宣布放弃维护该规范标准
+    - IndexedDB, 是一种存储在浏览器即客户端本地的类NoSQL数据库, 它是比Web SQL更符合前端的需求.
 
 
 
@@ -465,39 +497,6 @@
   - 另一方面, HMR它实际上是可选功能, 如一个模块并没有在module.hot中定义模块更新之后的具体行为(没有HMR处理函数), 它将向依赖树的上层冒泡, 直至找到处理函数, 否则将自动刷新页面. 这也是为什么你用style-loader不需要任何配置就能自动热更新, 因为它内部实现已经包含了HMR处理函数, 而自己写的只有一行的`console.log(1)`改为`console.log(2)`时却会导致页面刷新. 你需要加入`module.hot.accept(errorHandler);`来进行模块自更新.
   - https://webpack.docschina.org/api/hot-module-replacement
   - https://zhuanlan.zhihu.com/p/30669007
-
-
-* 用JS如何设置/删除 cookie 
-  1. 设置cookie并不是单单由名字来唯一确定的, 而是通过名字, 域名以及路径, 删除原理是将cookie过期时间设置为过去. 例如以下三个语句会在Google搜索页面设置三个同名但不同cookie.
-     1. document.cookie = "name=12; path=/search;"
-     2. document.cookie = "name=12; domain=.google.co.uk;"
-     3. document.cookie = "name=12; "
-   
-  2. 对于删除有几个要注意的 
-     1. 不能删除domain非当前域名的cookie
-     2. 对于domain是`当前域名`的, 删除时不能设置domain (例如https://segmentfault.com/中的sf_remember)
-     3. 对于domain是`.当前域名`, 删除时候必须带上domain职为domain或者.domain(例如`_ga`)
-  3. 设置cookie过程中对于没有设置的值会用默认值覆盖, 即使之前它有自己的值
-  4. 例如`document.cookie = "_ga=; expires=" + new Date(0).toGMTString() + "; max-age=0;  domain=segmentfault.com; path=/"`
-  5. https://stackoverflow.com/questions/179355/clearing-all-cookies-with-javascript
-  6. https://stackoverflow.com/questions/5688491/unable-to-delete-cookie-from-javascript
-
-
-
-* 既然前端可以自由的设置cookie, 会不会不安全? 考虑过`cookie`的安全问题吗?
-  + 服务器端返回cookie时, 对于某些敏感的cookie设置httpOnly为true, 这种cookie是无法通过document.cookie拿到的, 所以也就无法修改. 同时只会在发送请求的时候被附带, 使用脚本AJAX时由于无法获取, 所以也不会被带上.
-  + https://zhuanlan.zhihu.com/p/36197012
-  + 尽可能地设置有效期较短的cookie， 也就是增加expires/max-age (前者是HTTP1.0中的表示绝对时间后者是1.1新规范表示相对时间, 一般为保证兼容性都写), 或者干脆不写或者写一个早于当前时间的日期, 这样的话cookie将会随着Session一起过期
-  + 给cookie添加secure: true, 表示只在https协议下传输.
-  + 给敏感的cookie加密或者哈希
-
-
-
-    
-* 除了上面提到的三种, 还有吗? 
-  - 前端数据库, 相比sessionStorage/localStorage, 可存储的容量更大, 主要包含以下两种
-  - Web SQL, W3似乎已经宣布放弃维护该规范标准
-  - IndexedDB, 是一种存储在浏览器即客户端本地的类NoSQL数据库, 它是比Web SQL更符合前端的需求.
 
 
 
@@ -733,6 +732,12 @@
 
   // 以上例子充分说明了我提到的最后一点, 就是函数的执行每次都会创建新的上下文, 但是对于它的上方作用域链, 实际上只是浅拷贝.
   ```
+  - 网上的说法是EC(environment context)包含三个东西, this指针, 作用域链 和 VO (variable object)
+    1. this指针就不说了, 依情况而定
+    2. 作用域链主要是一个最终能追溯的全局作用域的链表
+    3. VO 放的是当前作用域下声明的函数, 变量以及函数传入的arguments
+    4. 另一个概念叫AO (activiation object), 当函数被调用, 则该函数的 VO 就是 AO (当然参数会被传入的arguments给注入)
+  - 所以结合我上面的说法来看的话, 作用域链实际上就是一个个的VO串接而成的, 在栈顶的VO就是AO. 同一个函数多次调用, 每次AO不同但是AO以上的VO相同.
   
 
 
@@ -806,7 +811,10 @@
   ```
     不显示, 也不占空间
   ```
-  - 忽略 table
+  - table
+  ```
+  不了解
+  ```
   
 
 * 如何去除inline-block元素间的间隙
@@ -994,7 +1002,7 @@ new Promise(r => r(1))
         console.log('break')
     })
 ```
-  
+ 
   
 * JavaScript中对象的属性定义与赋值的区别
     - http://www.cnblogs.com/ziyunfei/archive/2012/10/31/2738728.html
@@ -1151,7 +1159,7 @@ new Promise(r => r(1))
   
   
 * JavaScript的sort方法内部使用的什么排序？
-  - Chrome 查过10用快排否则用插入排序， Firefox 是归并
+  - Chrome中数组规模超过10用快排否则用插入排序， Firefox是归并
   
   
 * 请解释 JavaScript 中 `this` 是如何工作的。
@@ -1839,6 +1847,11 @@ function deepCopy2(targetObj) {
   + 缺点主要是部署相对单服务器更加复杂, 需要更多的花销. 另一方面一旦涉及内容更新, 需要将内容分发到各个节点, 在高峰期时段容易导致数据不能实时同步.
 
 
+* 什么是 DNS Prefetch
+  + 自动解析: 一般来说, 比较新的浏览器会自动将遇到的a标签中的href包含的域名解析为IP地址, 但是对于HTTS的超链接并不会自动解析
+  + 控制自动解析:  当我们希望对HTTPS的页面开启自动解析时, 可以添加 `<meta http-equiv="x-dns-prefetch-control" content="on">`, 如果你想关闭对HTTP的页面自动解析, 可以添加`<meta http-equiv="x-dns-prefetch-control" content="off">`
+  + 手动解析: `<link rel="dns-prefetch" href="需要缓存的url">` 在网页中加入这一行, 这样在用户单击当前网页中的连接时就无需进行DNS的解析，减少用户等待时间，提高用户体验。
+  + 由于浏览器域名解析使用的是本地缓存, 要远远快于路由器缓存或者ISP提供商缓存.
 
 
 
@@ -1936,17 +1949,21 @@ function deepCopy2(targetObj) {
   + 不论是 Polling 还是 Long-Polling, 本质都是利用HTTP进行数据通讯(具体实现可以使AJAX或者是基于iframe), Long-Polling的优势在于减少了请求的次数, 因为每次请求的大部分数据(包括头部信息)都是相同的, 减少请求次数有利于提高通讯效率. 同时也缓解了服务器的压力.
   + WebSocket详见上题
   + SSE (Server-Sent Event) 即HTML5 提出的一种服务器推送技术, 它允许服务器向客户端实时推送数据. 原理是JS脚本中与服务器之间建立连接, 但是客户端不会关闭连接，而是等待服务端不断得发送响应结果, 服务器可以随时推送新的消息给客户端, 但是它并不能跨域.
-  + 只需要在浏览器中使用 `new EventSource(url)` 创建连接, 并监听其一系列事件例如`open`, `message`, 'close', 'error'等等. 然后服务器端返回头中带上`content-type —— text/event-stream`即可.
+  + 只需要在浏览器中使用 `new EventSource(url)` 创建连接, 并监听其一系列事件例如`open`, `message`, 'close', 'error'等等. 然后服务器端返回头中带上`content-type: text/event-stream`即可.
 
 
 
 * 请描述以下 request 和 response headers：
-  * Diff. between Expires, Date, Age and If-Modified-...
-  * Do Not Track
-  * Cache-Control
-  * Transfer-Encoding
-  * ETag
+  * Do Not Track/ DNT
+    - `DNT: 0` 用户允许该网站对自己进行行为记录
+    - `DNT: 1` 用户不允许该网站对自己进行行为记录
+  * Content-Encoding
+    - 表明所使用的压缩方式, 常见的有gzip, compression, deflate
+    - 但是对于有些类型的资源例如jpg图片它已经被压缩过了, 所以再次压缩可能并不能减少资源的大小甚至有可能还会因为增加了解压的过程造成额外的加载时间.
   * X-Frame-Options
+    - `X-Frame-Options: deny` 不允许该网页渲染任何来源的`frame`, `iframe`, `embed`, `object`
+    - `X-Frame-Options: sameorigin` 只允许同源
+    - `X-Frame-Options: allow-from https://example.com/` 只允许某个指定的
   
 
   
@@ -2034,6 +2051,9 @@ var foo = "Hello";
   alert(foo + bar);
 })();
 alert(foo + bar);
+
+// Hello World
+// Ref Error
 ```
 
 *问题：`foo.x`的值是什么？*
