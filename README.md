@@ -767,6 +767,10 @@
   - 浏览器默认盒模型是 content-box 也就是说 盒宽 = 左右margin + 左右border + 左右padding + width (宽度即内容宽度) 同理高
   - 设置```* { box-sizing: border-box; }```之后 盒宽 = 左右margin + width (width = 左右border + 左右padding + 内容宽)
   
+* 谈谈负的margin
+  - 首先负的margin-top/margin-left, 他们会将元素向该元素的包含元素的上/左边界或者相邻元素的上/左边界拉, 也就是说会改变元素本身的位置
+  - 其次如果是负的margin-bottom/margin-right, 他们并不移动本身, 但是会把下/右的元素的边界拉近, 如果是父元素则会把父元素的高/宽度拉小.
+  
   
 * 请罗列出你所知道的 display 属性的全部值
   - block 
