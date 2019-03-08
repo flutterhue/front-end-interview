@@ -497,6 +497,15 @@
   - https://zhuanlan.zhihu.com/p/30669007
 
 
+* 有什么通知用户的方法
+  ```js
+  Notification.requestPermission( function(status) {
+    // 请求通知的权限
+    console.log(status); // 仅当值为 "granted" 时显示通知
+    var n = new Notification("title", {body: "notification body"}); // 显示通知
+  });
+  ```
+
 
 
 * 请解释 `<script>`、`<script async>` 和 `<script defer>` 的区别。
@@ -574,7 +583,27 @@
 * 描述`z-index`和叠加上下文是如何形成的。
   - https://juejin.im/post/5b876f86518825431079ddd6
   - https://www.zhangxinxu.com/wordpress/2016/01/understand-css-stacking-context-order-z-index/
-  
+
+
+
+* display: none;、visibility: hidden;、opacity: 0;的区别
+  - display: none; 
+    1. 不占空间, 不渲染, 所以该属性一旦改变会引起浏览器重排
+    2. 不被子类继承, 但是子类也不会显示
+    3. 不会触发绑定事件 (显然)
+    4. transition对它无效, 所以无法用transition做动画
+  - visibility: hidden;
+    1. 元素隐藏但不会消失, 也就是占着空间但是看不到, 所以一旦改变只会引起浏览器重绘
+    2. 被子类继承, 但是子类可以通过设置visibility: visible;来达到可见的效果.
+    3. 不触发绑定事件
+    4. transition对它无效, 所以无法用transition做动画
+  - opacity: 0;
+    1. 元素透明度100%, 也就是占着空间但是看不到, 所以一旦改变只会引起浏览器重绘
+    2. 会被子元素继承,但是子元素并不能通过opacity:1来达到可见的效果
+    3. 能触发绑定的事件
+    4. transition对它有效, 所以可以用transition做动画
+
+
   
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
   - http://www.cnblogs.com/lhb25/p/inside-block-formatting-ontext.html
@@ -1408,7 +1437,15 @@ function deepCopy2(targetObj) {
   test()
   ```
 
-
+* HTTP option 请求
+  - 主要功能是获取所请求的URL中所支持的HTTP请求方法, 同时也用来检查浏览器的性能. 
+  - 最常见的是, 正式跨域前对非简单请求会用option请求进行的预检.
+  - 简单请求必须满足以下三个条件, 否则为非简单请求.
+    1. GET/POST/HEAD方法
+    2. 头字段只能包含`Accept、Accept-Language、Content-Language、Content-Type、Last-Event-ID`.
+    3. Content-type只能取：application/x-www-form-urlencoded、multipart/form-data、text/plain
+  - 这里预检会判断该请求会判断该网站是否在服务器许可的跨域名单中, 如果不通过, 则不发起正式的跨域请求
+  - https://www.jianshu.com/p/5cf82f092201 
 
 * AJAX 的实现
   ```js
