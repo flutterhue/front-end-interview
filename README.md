@@ -625,6 +625,16 @@
 
 
   
+* 请描述 IFC(Inline Formatting Context) 及其如何工作。
+  - 形成: 只有在一个块级元素中仅包含内联级别元素时才会生成。
+  - 规则:
+    1. 内部的盒子会在水平方向，一个接一个地放置, 摆放这些盒子的时候，它们在水平方向上的 padding、border、margin 所占用的空间都会被考虑在内
+    2. 能把在一行上的框都完全包含进去的一个矩形区域，被称为该行的行框（line box）。行框的宽度是由包含块（containing box）和存在的浮动来决定, 高度由里面最高盒子的高度决定 (无关竖直方向的margin/padding)
+    3. 在垂直方向上，这些框可能会以不同形式来对齐(vertical-align), 例如底部或顶部对齐，或者内部的文本基线（baseline）对齐, 主要配合上文提到的line-box来做垂直方向上的对齐.
+    4. IFC之间如果有块级元素会被隔开成两个独立的IFC, 就算是有多行的情况下, 行高也可能不同
+  - 作用:
+    1. 水平居中: 给一个块级元素加上display: inline-block，然后用父元素包裹住, 那么在父元素内部就会形成IFC, 此时给父元素添加 text-align: center 就能居中该块级元素.
+    2. 垂直居中: 给一个块级元素加上display: inline-block，然后用父元素包裹住, 那么在父元素内部就会形成IFC, 此时给父元素添加一个伪元素, 使其高度为100%，inline-block 同时 vertical-align: middle, 此时只需要给该块级元素也加上vertical-align: middle 就能垂直居中.
   
 * 列举不同的清除浮动的技巧，并指出它们各自适用的使用场景。
   - 末尾添加一个空div作为兄弟：`<div style="clear: both;"/>`
