@@ -606,8 +606,24 @@
 
   
 * 请描述 BFC(Block Formatting Context) 及其如何工作。
-  - http://www.cnblogs.com/lhb25/p/inside-block-formatting-ontext.html
-  - 消边距折叠 https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing
+  - 块级格式化上下文，它是指一个独立的块级渲染区域，只有Block-level BOX参与，该区域拥有一套渲染规则来约束块级盒子的布局，且与区域外部无关
+  - 形成
+    1. 根元素html 而不是body, 并且body设置overflow: hidden 无效, 详见https://stackoverflow.com/questions/41506456/why-body-overflow-not-working/41507857#41507857
+    2. overflow 不为 hidden
+    3. display的值为inline-block、table-cell、table-caption
+    4. position的值为absolute或fixed
+  - 规则 
+    1. BFC的区域不会与float区域重叠, 两个元素是兄弟关系
+    2. BFC元素如果存在某个子元素是浮动元素, 浮动元素仍参与父元素的高度计算
+    3. 属于不同BFC的两个Box的margin不会发生合并
+      - https://www.cnblogs.com/ianyanyzx/p/9126402.html
+      - https://developer.mozilla.org/zh-CN/docs/Web/CSS/CSS_Box_Model/Mastering_margin_collapsing
+  - 作用 (请配合进行理解 https://codesandbox.io/s/vmx59kwy00)
+    1. 利用规则1可以防止布局过程中侧边栏和主栏目发生重叠
+    2. 利用规则2可以防止元素塌陷
+    3. 利用规则3可以防止兄弟/父子元素之间外边距合并
+
+
   
   
 * 列举不同的清除浮动的技巧，并指出它们各自适用的使用场景。
@@ -1485,6 +1501,12 @@ function deepCopy2(targetObj) {
 
 
 
+* AJAX 的取消
+  - 如果是原生的XMLHttpRequest的对象, 直接 xhr.abort() 即可 同时可以监听onabort事件来处理abort之后要做的工作.
+  - 值得注意的地方是, 中断请求之后极有可能服务器端已经对该请求做出了相应的处理并给出了响应, 只不过浏览器不接收这个响应罢了. 同时如果使用fetch， 暂时无法中断请求.
+
+
+
 
 * HTTPS 和 HTTP 区别
   - HTTPS 在 HTTP 的基础上, 增加了一层 SSL (secure socket layer), HTTPS 的安全性, 体现在方面 __内容加密__ 以及 __网站真实性认证__(因为HTTP本身是明文传输的, 同时没有任何认证方式)
@@ -2108,6 +2130,15 @@ foo.x = foo = { n: 2 };
 //
 // bar
 // { n: 1, x: { n: 2 } }
+```
+
+* 下面两个的结果是什么
+```js
+console.log(typeof (new (class { class() { console.log(1) } } )))
+// object
+
+(function class () { console.log(1) })()
+// Uncaught SyntaxError: Unexpected token class
 ```
 
 * 实现一个LazyMan，可以按照以下方式调用:
