@@ -65,6 +65,32 @@
 
 
 
+
+* 操作DOM的原生API
+  1. parentNode.insertBefore(newNode, childNode) 将`newNode`插入到`childNode`之前.
+    + `childNode`必须是`parentNode`的孩子
+    + 如果newNode已经在DOM中存在, 则该函数视为移动， 即之前位置的会被删除.
+    + 如果childNode为null, 则newNode会被插入到parentNode的孩子队列的末尾.
+    + 返回值是刚插入的`newNode`
+  2. parentNode.removeChild(childNode) 将`childNode`删除
+    + `childNode`必须是`parentNode`的孩子
+    + `返回值是`childNode`, 可以储存起来之后复用
+  3. parentNode.replaceChild(newChild, oldChild) 用`newChild`替换`oldChild`
+    + `oldChild`必须是`parentNode`的孩子
+    + 如果newChild已经在DOM中存在, 则该函数视为移动， 即之前位置的会被删除.
+    + 返回值是被替换下来的`oldChild`
+  4. parentNode.appendChild(child) 插入child到parentNode孩子队列的末尾
+    + 如果newNode已经在DOM中存在, 则该函数视为移动， 即之前位置的会被删除.
+    + 返回值是刚插入的`child`
+  5. parentNode.append/prepend 插入一系列节点到`parentNode`的孩子队列
+  6. node.insertAdjacentElement(position, newNode) 根据position的值不同插入到不同的位置
+    + node 的可能取值以及含义
+      + 'beforebegin': newNode插到node之前
+      + 'afterbegin': newNode插到node的第一个孩子之前
+      + 'beforeend': newNode插到node的最后一个孩子之后
+      + 'afterend': noewNode插到node之后
+
+
 * 浏览器中DOMContentLoaded, load等等事件的触发顺序
   + https://github.com/fi3ework/BLOG/issues/3
   + `DOMContentLoaded` —— 浏览器已经完全加载了 HTML，DOM 树已经构建完毕，但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
@@ -1781,7 +1807,7 @@ function deepCopy2(targetObj) {
 
 
 * 如何避免浏览器缓存get请求，以便达到每次get请求都能获取最新的数据
-  - 在请求的头部中加上`cache-control: no-cache`
+  - 在请求的头部中加上`cache-control: no-store`
   - 在请求的url尾部加上'?r=随机数' e.g. www.host.com/somewhere.html?r=821293
 
 
