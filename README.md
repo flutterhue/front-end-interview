@@ -91,9 +91,17 @@
       + 'afterend': noewNode插到node之后
 
 
+* node.children 和 node.childNodes
+  + 继承链是 EventTarget <- Node <- Element <- HTMLElement
+  + node.children返回的是一系列的elements
+  + node.childNodes返回的是一系列的nodes, nodes 不单单包括element node还包括文本node
+  + 通常情况下我们想要的都是node.children
+
+
+
 * 浏览器中DOMContentLoaded, load等等事件的触发顺序
   + https://github.com/fi3ework/BLOG/issues/3
-  + `DOMContentLoaded` —— 浏览器已经完全加载了 HTML，DOM 树已经构建完毕，但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
+  + `DOMContentLoaded` —— 浏览器的DOM树已经构建完毕，同时非async的js文件都已经解析完成, 但是像是  `<img>` 和样式表等外部资源可能并没有下载完毕, 此时JS可以访问所有 DOM 节点，初始化界面
   + `load` —— 浏览器已经加载了所有的资源（图像，样式表等), 此时可以获得图片大小
   + `beforeunload` 在用户即将离开页面时触发，它返回一个字符串，浏览器会向用户展示并询问这个字符串以确定是否离开
   + `unload` 在用户已经离开时触发，我们在这个阶段仅可以做一些没有延迟的操作，由于种种限制，很少被使用
@@ -162,7 +170,7 @@
   - 另外展开说的话, 总的一条原则就是, 加载是并行的, 执行是串行的.
     1. 在一条外联JS的前后打上时间戳, 时间差并不等于JS下载的时间, 甚至也不等于下载加执行的事件, 实际上, 如果JS之前有CSS的话, 必须要等到CSS下载完成阻塞结束之后才会执行该条JS(即使JS早已经加载完成). 
     2. 上一条是在说前一文件的加载阻塞下一文件的执行, 这里要说的是下一文件的加载不会影响到前面文件的执行和加载, 甚至是前面的文件中又动态加载（AJAX）了新的JS文件. 所以无关紧要(与首屏无关的JS)尽量往后放.
-    3. HTML里面Script的加载和执行均会影响 DOMContentLoaded事件的触发. 所以如果body结尾的JS标签阻塞的话, DOMContentLoaded的触发也会阻塞.
+    3. HTML里面Script的加载和执行均会影响 DOMContentLoaded事件的触发. 即使是放在body结尾的JS标签阻塞, 也会使得DOMContentLoaded推迟触发, 除非在标签中加上async.
 
 
   
