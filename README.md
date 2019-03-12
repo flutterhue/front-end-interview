@@ -695,10 +695,22 @@
 
 * 什么是`rem`和`em`有什么区别
   - https://yanhaijing.com/css/2017/09/29/principle-of-rem-layout/
-  - em作为font-size的单位时，其代表父元素的字体大小，em作为其他属性单位时，代表自身字体大小
-  - rem作用于非根元素时，相对于根元素字体大小；rem作用于根元素字体大小时，相对于其出初始字体大小
+  - 首先浏览器默认字体大小为16px, 即HTML元素的字体大小为16px
+  - em作为font-size的单位时，其代表父元素的字体大小(计算好的大小)，也就是说如果父亲是body, 并没有设置过em, 儿子写2em, 则儿子font-size为16 * 2 = 32px. 如果父亲写了2em, 儿子也是2em, 则儿子font-size为16 * 2 * 2 = 64px
+  - em作为其他属性单位时，代表自身字体大小, 比如某个元素它的父亲是16px, 它自己的font-size: 2em, 然后width为2em. 则它的font-size是32px, 而宽是相对于这个32px的2em, 所以是64px
+  - rem作用于非根元素时，相对于根元素字体大小, 这里说的根元素指的是html而不是body. rem作用于根元素字体大小时，相对于其出初始字体大小
   - rem可以用来做弹性布局, 通过设置根元素的字体大小来作为其他元素大小的单位.
   - 但更好的方案是 vw —— 视口宽度的 1/100；vh —— 视口高度的 1/10
+
+
+* 对于 line-height 的理解
+  - line-height 指一行字的高度，包含了字间距，实际上是下一行基线到上一行基线距离
+  - 如果一个标签没有定义 height 属性，那么其最终表现的高度为 line-height * 文字所占的行数
+  - 把 line-height 值设置为 height 一样大小的值可以实现单行文字的垂直居中
+  - line-height 和 height 都能撑开一个高度，height 会触发 haslayout（一个低版本IE的东西），而 line-height 不会
+  - line-height 可设置的常见单位
+    1. px: 绝对单位
+    2. em/纯数字/百分比: 实际上 3em/3/300% 在line-height中作用相同, 都是相当元素本身的字体大小的倍数
   
   
 * 水平居中的方式
