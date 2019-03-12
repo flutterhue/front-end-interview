@@ -142,6 +142,26 @@
   + 在 Web Workers 中, 也就是HTML5新提出的JS多线程中的工作线程
   + 用于对象深拷贝
   
+
+
+
+* 前端可以尝试哪些会计较有利于 SEO (Search Engine Optimization)
+  + 合理的title、description、keywords：搜索对着三项的权重逐个减小，title值强调重点即可，重要关键词出现不要超过2次，而且要靠前，不同页面title要有所不同；description把页面内容高度概括，长度合适，不可过分堆砌关键词，不同页面description有所不同；keywords列举出重要关键词即可
+    1. title 即页面title
+    2. Description标签写页面的简介描述，一般在110字以内, 具体格式见下例
+    ```html
+    <meta name="description" property="og:description" content="有问题，上知乎。知乎，可信赖的问答社区，以让每个人高效获得可信赖的解答为使命。知乎凭借认真、专业和友善的社区氛围，结构化、易获得的优质内容，基于问答的内容生产方式和独特的社区机制，吸引、聚集了各行各业中大量的亲历者、内行人、领域专家、领域爱好者，将高质量的内容透过人的节点来成规模地生产和分享。用户通过问答等交流方式建立信任和连接，打造和提升个人影响力，并发现、获得新机会。">
+    ```
+    3. Keywords标签写页面主关键词，一般是5个词左右，用英文逗号分隔。具体格式类似Description
+    ```html
+    <meta name="description" content="XXX" />
+    ```
+  + 语义化的HTML代码，符合W3C规范：语义化代码让搜索引擎容易理解网页
+  + 重要内容不要用js输出：爬虫不会执行js获取内容
+  + 非装饰性图片必须加alt
+  + 重要内容HTML代码放在最前：搜索引擎抓取HTML顺序是从上到下，有的搜索引擎对抓取长度有限制，保证重要内容一定会被抓取
+  + 提高网站速度：网站速度是搜索引擎排序的一个重要指标
+
   
 * 你能描述渐进增强 (progressive enhancement) 和优雅降级 (graceful degradation) 之间的不同吗?
   ```
