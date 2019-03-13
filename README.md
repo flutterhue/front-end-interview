@@ -220,24 +220,6 @@
   
 
 
-* `window.innerWidth`和 `document.documentElement.clientWidth`的区别
-  + ??? https://zhuanlan.zhihu.com/p/37031348
-  ```
-  	
- 	// 设备屏幕的宽高，可用宽高都包含在该对象中
-	document.screen / screen
-	
-	// 如果缩放原地爆炸 以下结论不一定成立（浏览器有差异）
-	
-	// 浏览器视窗宽高 不包括滚动条
-	document.documentElement.clientWidth
-	析document.documentElement.clientHeight
-	
-	// 浏览器视窗宽高 包括滚动条
-	window.innerWidth
-	window.innerHeight
-  ```
-  
   
 * 请解释 CSS 动画和 JavaScript 动画的优缺点。
   + CSS定制自由度差，但比较方便。JS自由度大，但需要代码开发。
@@ -268,7 +250,7 @@
   
 * 什么是跨域资源共享 (CORS)？它用于解决什么问题？
   + Same-origin(同源) : 资源路径的协议、域名以及端口号与当前域一致
-  + `<script>``<img>``<iframe>``<link>``<video>``<audio>`等带有`src`属性的标签默认支持跨域
+  + `<script><img><iframe><link><video><audio>`等带有`src`属性的标签默认支持跨域
   + 不同源的document或者js(例如iframe中的js)想要读取或者操作当前document将受到限制
   + 禁止Ajax发起跨域请求， 实际上请求会发起， 只不过返回响应会被浏览器拦截。
   + Ajax跨域请求不能携带本网站Cookie
@@ -1052,6 +1034,7 @@
     undefined
     VM745:1 timeout
   ```
+  - 一个值得一看的问题 (结合了promise 以及 async) https://segmentfault.com/q/1010000016147496/
   
   
 * 浏览器的事件循环和nodejs事件循环的区别
@@ -1566,7 +1549,7 @@ function deepCopy2(targetObj) {
           //数据在xhr.responseText
       }
   };
-  xhr.open("content-type", "server-url", true);
+  xhr.open(method, url, async);
   xhr.send("content"); 
   /*
     // xhr.readyState状态的含义
